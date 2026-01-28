@@ -252,6 +252,55 @@ body {
     box-shadow: 0 1px 0 #3D8AE5;
 }
 
+/* Game stats (timer + score) */
+.game-stats {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 8px;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #666;
+}
+
+.stat-icon {
+    font-size: 18px;
+}
+
+.stat-value {
+    color: var(--purple);
+    min-width: 36px;
+}
+
+/* Points popup */
+.points-popup {
+    position: absolute;
+    font-family: 'Nunito', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--green);
+    pointer-events: none;
+    transform: translateX(-50%);
+    animation: pointsFloat 0.8s ease forwards;
+    z-index: 10;
+}
+
+@keyframes pointsFloat {
+    0% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-60px);
+    }
+}
+
 .target-display {
     background: white;
     border-radius: 20px;
@@ -448,7 +497,91 @@ body {
     font-size: 28px;
     font-weight: 700;
     color: var(--purple);
-    margin-bottom: 40px;
+    margin-bottom: 16px;
+}
+
+/* Final stats */
+.final-stats {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 12px;
+}
+
+.final-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    border-radius: 16px;
+    padding: 12px 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.final-stat-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.final-stat-value {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--purple);
+}
+
+/* New high score */
+.new-high-score {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--coral);
+    animation: celebratePulse 1s ease infinite;
+    margin-bottom: 8px;
+}
+
+/* Leaderboard */
+.leaderboard {
+    background: white;
+    border-radius: 16px;
+    padding: 12px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    min-width: 200px;
+}
+
+.leaderboard > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.leaderboard > div + div {
+    border-top: 1px solid #f0f0f0;
+}
+
+.leaderboard .medal {
+    font-size: 22px;
+}
+
+.leaderboard .lb-score {
+    color: var(--purple);
+    flex: 1;
+}
+
+.leaderboard .lb-time {
+    color: #999;
+    font-size: 16px;
+}
+
+.leaderboard .current-score {
+    background: #FFF9E6;
+    border-radius: 8px;
+    margin: 2px -8px;
+    padding: 6px 8px;
 }
 
 /* Confetti */
@@ -520,6 +653,18 @@ body {
     .star {
         font-size: 48px;
     }
+
+    .final-stats {
+        gap: 20px;
+    }
+
+    .final-stat-value {
+        font-size: 28px;
+    }
+
+    .leaderboard > div {
+        font-size: 18px;
+    }
 }
 
 @media (max-height: 600px) {
@@ -548,6 +693,40 @@ body {
 
     .target-word {
         font-size: 36px;
+    }
+
+    .game-stats {
+        margin-bottom: 4px;
+        gap: 16px;
+    }
+
+    .stat {
+        font-size: 16px;
+    }
+
+    .complete-message {
+        margin-bottom: 10px;
+    }
+
+    .final-stats {
+        margin-bottom: 8px;
+    }
+
+    .final-stat {
+        padding: 8px 16px;
+    }
+
+    .final-stat-value {
+        font-size: 24px;
+    }
+
+    .leaderboard {
+        padding: 8px 14px;
+        margin-bottom: 12px;
+    }
+
+    .stars {
+        margin: 16px 0;
     }
 }
 

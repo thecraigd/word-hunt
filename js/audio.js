@@ -21,6 +21,9 @@ const VICTORY_PHRASES = [
     'you-did-it'
 ];
 
+const HIGH_SCORE_PHRASES = ['high-score/high-score1', 'high-score/high-score2', 'high-score/high-score3'];
+const TOP_THREE_PHRASES = ['high-score/top-three1', 'high-score/top-three2', 'high-score/top-three3'];
+
 class AudioManager {
     constructor() {
         this.audioCache = new Map();

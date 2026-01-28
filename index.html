@@ -66,6 +66,16 @@
                     </svg>
                 </button>
             </div>
+            <div class="game-stats">
+                <div class="stat">
+                    <span class="stat-icon">⏱</span>
+                    <span id="timer" class="stat-value">0:00</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-icon">⭐</span>
+                    <span id="score" class="stat-value">0</span>
+                </div>
+            </div>
             <div id="target-display" class="target-display">
                 <span id="target-label" class="target-label">Find the word:</span>
                 <span id="target-word" class="target-word"></span>
@@ -83,6 +93,18 @@
                 <span class="star">★</span>
             </div>
             <p id="complete-message" class="complete-message">You found all the words!</p>
+            <div class="final-stats">
+                <div class="final-stat">
+                    <span class="final-stat-label">Score</span>
+                    <span id="final-score" class="final-stat-value">0</span>
+                </div>
+                <div class="final-stat">
+                    <span class="final-stat-label">Time</span>
+                    <span id="final-time" class="final-stat-value">0:00</span>
+                </div>
+            </div>
+            <div id="new-high-score" class="new-high-score" style="display:none">New High Score!</div>
+            <div id="leaderboard" class="leaderboard"></div>
             <button id="play-again-btn" class="play-btn">Play Again</button>
         </div>
     </div>
