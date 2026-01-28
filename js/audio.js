@@ -25,8 +25,8 @@ const HIGH_SCORE_PHRASES = ['high-score/high-score1', 'high-score/high-score2', 
 const TOP_THREE_PHRASES = ['high-score/top-three1', 'high-score/top-three2', 'high-score/top-three3'];
 
 const BACKGROUND_TRACKS = [
-    "background/Ever, You're Doing Great",
-    'background/Open up the page',
+    'background/Ever-Youre-Doing-Great',
+    'background/Open-up-the-page',
     'background/Retrowave'
 ];
 
@@ -93,6 +93,7 @@ class AudioManager {
 
         // Preload effects
         loadPromises.push(this.preloadAudio('effects/click'));
+        loadPromises.push(this.preloadAudio('effects/game-start'));
         loadPromises.push(this.preloadAudio('effects/correct'));
         loadPromises.push(this.preloadAudio('effects/try-again'));
 
@@ -183,6 +184,14 @@ class AudioManager {
     async playClick() {
         if (!this.audioEnabled) return;
         await this.playAudio('effects/click');
+    }
+
+    /**
+     * Play game start sound effect
+     */
+    async playGameStart() {
+        if (!this.audioEnabled) return;
+        await this.playAudio('effects/game-start');
     }
 
     /**

@@ -155,6 +155,7 @@ class WordHuntGame {
     async startGame() {
         // Unlock audio on user interaction
         await audioManager.unlockAudio();
+        audioManager.playGameStart();
 
         this.showScreen(GameState.LOADING);
 
