@@ -92,6 +92,7 @@ class AudioManager {
         }
 
         // Preload effects
+        loadPromises.push(this.preloadAudio('effects/click'));
         loadPromises.push(this.preloadAudio('effects/correct'));
         loadPromises.push(this.preloadAudio('effects/try-again'));
 
@@ -174,6 +175,14 @@ class AudioManager {
         if (!this.audioEnabled) return;
         const phrase = TOP_THREE_PHRASES[Math.floor(Math.random() * TOP_THREE_PHRASES.length)];
         await this.playAudioAndWait(`victory/${phrase}`);
+    }
+
+    /**
+     * Play click sound effect
+     */
+    async playClick() {
+        if (!this.audioEnabled) return;
+        await this.playAudio('effects/click');
     }
 
     /**

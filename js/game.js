@@ -82,7 +82,10 @@ class WordHuntGame {
         this.replayAudioBtn.addEventListener('click', () => this.replayCurrentWord());
 
         // Back button
-        this.backBtn.addEventListener('click', () => this.goToMenu());
+        this.backBtn.addEventListener('click', () => {
+            audioManager.playClick();
+            this.goToMenu();
+        });
 
         // Music toggle
         this.musicToggleBtn.addEventListener('click', () => this.toggleMusic());
@@ -92,6 +95,7 @@ class WordHuntGame {
         // Difficulty buttons
         this.difficultyBtns.forEach(btn => {
             btn.addEventListener('click', () => {
+                audioManager.playClick();
                 this.difficultyBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 this.difficulty = btn.dataset.difficulty;
