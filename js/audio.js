@@ -1,0 +1,171 @@
+/**
+ * Audio management for Word Hunt game
+ *
+ * Audio files hosted on Cloudflare R2:
+ * https://pub-39b6eccef9ff4f43a7db37a762a6e6d8.r2.dev/word-hunt/audio/
+ */
+
+const AUDIO_BASE_URL = 'https://pub-39b6eccef9ff4f43a7db37a762a6e6d8.r2.dev/word-hunt/audio';
+
+// Victory phrases available
+const VICTORY_PHRASES = ['great-job', 'well-done', 'you-did-it', 'excellent'];
+
+class AudioManager {
+    constructor() {
+        this.audioCache = new Map();
+        this.audioUnlocked = false;
+        this.audioEnabled = true;
+    }
+
+    /**
+     * Unlock audio on iOS/mobile (requires user interaction)
+     */
+    async unlockAudio() {
+        if (this.audioUnlocked) return;
+
+        // Create and play a silent audio context to unlock
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                const ctx = new AudioContext();
+                const buffer = ctx.createBuffer(1, 1, 22050);
+                const source = ctx.createBufferSource();
+                source.buffer = buffer;
+                source.connect(ctx.destination);
+                source.start(0);
+                await ctx.resume();
+            }
+            this.audioUnlocked = true;
+        } catch (e) {
+            console.log('Audio unlock not needed or failed:', e);
+            this.audioUnlocked = true;
+        }
+    }
+
+    /**
+     * Preload audio files for a word set
+     */
+    async preloadWords(words) {
+        const loadPromises = [];
+
+        // Preload word prompts
+        for (const word of words) {
+            loadPromises.push(this.preloadAudio(`find/${word.toLowerCase()}`));
+        }
+
+        // Preload victory phrases
+        for (const phrase of VICTORY_PHRASES) {
+            loadPromises.push(this.preloadAudio(`victory/${phrase}`));
+        }
+
+        // Preload effects
+        loadPromises.push(this.preloadAudio('effects/correct'));
+        loadPromises.push(this.preloadAudio('effects/try-again'));
+
+        // Wait for all to load (with timeout)
+        await Promise.allSettled(loadPromises);
+    }
+
+    /**
+     * Preload a single audio file
+     */
+    preloadAudio(path) {
+        return new Promise((resolve) => {
+            if (this.audioCache.has(path)) {
+                resolve(this.audioCache.get(path));
+                return;
+            }
+
+            const audio = new Audio();
+            audio.preload = 'auto';
+
+            const timeout = setTimeout(() => {
+                console.log(`Audio load timeout: ${path}`);
+                resolve(null);
+            }, 5000);
+
+            audio.oncanplaythrough = () => {
+                clearTimeout(timeout);
+                this.audioCache.set(path, audio);
+                resolve(audio);
+            };
+
+            audio.onerror = () => {
+                clearTimeout(timeout);
+                console.log(`Audio load failed: ${path}`);
+                resolve(null);
+            };
+
+            audio.src = `${AUDIO_BASE_URL}/${path}.mp3`;
+        });
+    }
+
+    /**
+     * Play audio for "Find the word... [word]"
+     */
+    async playFindWord(word) {
+        if (!this.audioEnabled) return;
+        await this.playAudio(`find/${word.toLowerCase()}`);
+    }
+
+    /**
+     * Play a random victory phrase
+     */
+    async playVictory() {
+        if (!this.audioEnabled) return;
+        const phrase = VICTORY_PHRASES[Math.floor(Math.random() * VICTORY_PHRASES.length)];
+        await this.playAudio(`victory/${phrase}`);
+    }
+
+    /**
+     * Play correct answer sound effect
+     */
+    async playCorrect() {
+        if (!this.audioEnabled) return;
+        await this.playAudio('effects/correct');
+    }
+
+    /**
+     * Play wrong answer sound effect
+     */
+    async playTryAgain() {
+        if (!this.audioEnabled) return;
+        await this.playAudio('effects/try-again');
+    }
+
+    /**
+     * Play an audio file
+     */
+    async playAudio(path) {
+        const cached = this.audioCache.get(path);
+
+        if (cached) {
+            try {
+                cached.currentTime = 0;
+                await cached.play();
+            } catch (e) {
+                console.log('Audio play failed:', e);
+            }
+        } else {
+            // Try to load and play on demand
+            const audio = new Audio(`${AUDIO_BASE_URL}/${path}.mp3`);
+            try {
+                await audio.play();
+                this.audioCache.set(path, audio);
+            } catch (e) {
+                console.log('Audio play failed:', e);
+            }
+        }
+    }
+
+    /**
+     * Toggle audio on/off
+     */
+    toggleAudio() {
+        this.audioEnabled = !this.audioEnabled;
+        return this.audioEnabled;
+    }
+}
+
+// Global audio manager instance
+const audioManager = new AudioManager();

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Word Hunt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h1 class="title">Word Hunt</h1>
+            <div class="bouncing-letters">
+                <span style="--delay: 0">A</span>
+                <span style="--delay: 1">B</span>
+                <span style="--delay: 2">C</span>
+            </div>
+            <div class="difficulty-selector">
+                <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
+                <button class="difficulty-btn" data-difficulty="harder">Harder</button>
+            </div>
+            <button id="play-btn" class="play-btn">Play</button>
+        </div>
+
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="screen">
+            <div class="loading-text">Loading...</div>
+            <div class="bouncing-letters large">
+                <span style="--delay: 0">W</span>
+                <span style="--delay: 1">O</span>
+                <span style="--delay: 2">R</span>
+                <span style="--delay: 3">D</span>
+                <span style="--delay: 4">S</span>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="progress">
+                    <span id="current-word">1</span> / <span id="total-words">10</span>
+                </div>
+                <button id="replay-audio-btn" class="replay-btn" title="Hear word again">
+                    <svg viewBox="0 0 24 24" width="32" height="32">
+                        <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="target-display" class="target-display">
+                <span class="target-label">Find the word:</span>
+                <span id="target-word" class="target-word"></span>
+            </div>
+            <div id="word-area" class="word-area"></div>
+        </div>
+
+        <!-- Complete Screen -->
+        <div id="complete-screen" class="screen">
+            <div id="confetti-container"></div>
+            <h1 class="complete-title">Amazing!</h1>
+            <div class="stars">
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+            </div>
+            <p class="complete-message">You found all the words!</p>
+            <button id="play-again-btn" class="play-btn">Play Again</button>
+        </div>
+    </div>
+
+    <script src="js/words.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
