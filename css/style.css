@@ -227,6 +227,45 @@ body {
     color: var(--purple);
 }
 
+.music-btn {
+    background: #E8E8E8;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 0 #CCCCCC;
+    transition: all 0.15s ease;
+}
+
+.music-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #CCCCCC;
+}
+
+.music-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #CCCCCC;
+}
+
+.music-btn.active {
+    background: var(--green);
+    color: white;
+    box-shadow: 0 3px 0 #3BA83B;
+}
+
+.music-btn.active:hover {
+    box-shadow: 0 5px 0 #3BA83B;
+}
+
+.music-btn.active:active {
+    box-shadow: 0 1px 0 #3BA83B;
+}
+
 .replay-btn {
     background: var(--blue);
     border: none;

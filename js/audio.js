@@ -24,11 +24,19 @@ const VICTORY_PHRASES = [
 const HIGH_SCORE_PHRASES = ['high-score/high-score1', 'high-score/high-score2', 'high-score/high-score3'];
 const TOP_THREE_PHRASES = ['high-score/top-three1', 'high-score/top-three2', 'high-score/top-three3'];
 
+const BACKGROUND_TRACKS = [
+    "background/Ever, You're Doing Great",
+    'background/Open up the page',
+    'background/Retrowave'
+];
+
 class AudioManager {
     constructor() {
         this.audioCache = new Map();
         this.audioUnlocked = false;
         this.audioEnabled = true;
+        this.musicEnabled = true;
+        this.bgMusic = null;
     }
 
     /**
@@ -221,6 +229,48 @@ class AudioManager {
     toggleAudio() {
         this.audioEnabled = !this.audioEnabled;
         return this.audioEnabled;
+    }
+
+    /**
+     * Start background music (random track, looping)
+     */
+    startBackgroundMusic() {
+        this.stopBackgroundMusic();
+        if (!this.musicEnabled) return;
+
+        const track = BACKGROUND_TRACKS[Math.floor(Math.random() * BACKGROUND_TRACKS.length)];
+        const parts = track.split('/');
+        const encoded = parts.map(p => encodeURIComponent(p)).join('/');
+        const audio = new Audio(`${AUDIO_BASE_URL}/${encoded}.mp3`);
+        audio.loop = true;
+        audio.volume = 0.25;
+
+        audio.play().catch(e => console.log('Background music play failed:', e));
+        this.bgMusic = audio;
+    }
+
+    /**
+     * Stop background music
+     */
+    stopBackgroundMusic() {
+        if (this.bgMusic) {
+            this.bgMusic.pause();
+            this.bgMusic.currentTime = 0;
+            this.bgMusic = null;
+        }
+    }
+
+    /**
+     * Toggle background music on/off
+     */
+    toggleMusic() {
+        this.musicEnabled = !this.musicEnabled;
+        if (this.musicEnabled) {
+            this.startBackgroundMusic();
+        } else {
+            this.stopBackgroundMusic();
+        }
+        return this.musicEnabled;
     }
 }
 

@@ -59,6 +59,11 @@ class WordHuntGame {
         this.confettiContainer = document.getElementById('confetti-container');
         this.completeMessage = document.getElementById('complete-message');
 
+        // Music toggle
+        this.musicToggleBtn = document.getElementById('music-toggle-btn');
+        this.musicIconOn = document.getElementById('music-icon-on');
+        this.musicIconOff = document.getElementById('music-icon-off');
+
         // Scoring elements
         this.timerEl = document.getElementById('timer');
         this.scoreEl = document.getElementById('score');
@@ -79,6 +84,11 @@ class WordHuntGame {
         // Back button
         this.backBtn.addEventListener('click', () => this.goToMenu());
 
+        // Music toggle
+        this.musicToggleBtn.addEventListener('click', () => this.toggleMusic());
+        // Set initial state
+        this.updateMusicButton();
+
         // Difficulty buttons
         this.difficultyBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -91,7 +101,25 @@ class WordHuntGame {
 
     goToMenu() {
         this.stopTimer();
+        audioManager.stopBackgroundMusic();
         this.showScreen(GameState.START);
+    }
+
+    toggleMusic() {
+        audioManager.toggleMusic();
+        this.updateMusicButton();
+    }
+
+    updateMusicButton() {
+        if (audioManager.musicEnabled) {
+            this.musicToggleBtn.classList.add('active');
+            this.musicIconOn.style.display = '';
+            this.musicIconOff.style.display = 'none';
+        } else {
+            this.musicToggleBtn.classList.remove('active');
+            this.musicIconOn.style.display = 'none';
+            this.musicIconOff.style.display = '';
+        }
     }
 
     isAlphabetMode() {
@@ -142,6 +170,7 @@ class WordHuntGame {
         this.totalWordsEl.textContent = WORDS_PER_GAME;
         this.showScreen(GameState.PLAYING);
         this.startTimer();
+        audioManager.startBackgroundMusic();
         this.showNextWord();
     }
 
@@ -463,6 +492,7 @@ class WordHuntGame {
 
     gameComplete() {
         this.stopTimer();
+        audioManager.stopBackgroundMusic();
         const totalTime = (Date.now() - this.gameStartTime) / 1000;
 
         // Update message based on mode
