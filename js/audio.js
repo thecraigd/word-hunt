@@ -83,6 +83,14 @@ class AudioManager {
             loadPromises.push(this.preloadAudio(`victory/${phrase}`));
         }
 
+        // Preload high score / top three phrases
+        for (const phrase of HIGH_SCORE_PHRASES) {
+            loadPromises.push(this.preloadAudio(`victory/${phrase}`));
+        }
+        for (const phrase of TOP_THREE_PHRASES) {
+            loadPromises.push(this.preloadAudio(`victory/${phrase}`));
+        }
+
         // Preload effects
         loadPromises.push(this.preloadAudio('effects/correct'));
         loadPromises.push(this.preloadAudio('effects/try-again'));
@@ -147,6 +155,24 @@ class AudioManager {
     async playVictory() {
         if (!this.audioEnabled) return;
         const phrase = VICTORY_PHRASES[Math.floor(Math.random() * VICTORY_PHRASES.length)];
+        await this.playAudioAndWait(`victory/${phrase}`);
+    }
+
+    /**
+     * Play a random high score phrase and wait for it to finish
+     */
+    async playHighScore() {
+        if (!this.audioEnabled) return;
+        const phrase = HIGH_SCORE_PHRASES[Math.floor(Math.random() * HIGH_SCORE_PHRASES.length)];
+        await this.playAudioAndWait(`victory/${phrase}`);
+    }
+
+    /**
+     * Play a random top-three phrase and wait for it to finish
+     */
+    async playTopThree() {
+        if (!this.audioEnabled) return;
+        const phrase = TOP_THREE_PHRASES[Math.floor(Math.random() * TOP_THREE_PHRASES.length)];
         await this.playAudioAndWait(`victory/${phrase}`);
     }
 

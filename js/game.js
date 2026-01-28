@@ -518,11 +518,14 @@ class WordHuntGame {
         if (isNewHigh) {
             this.newHighScoreEl.textContent = 'New High Score!';
             this.newHighScoreEl.style.display = 'block';
+            audioManager.playHighScore();
         } else if (isTop3) {
             this.newHighScoreEl.textContent = 'Top 3 Score!';
             this.newHighScoreEl.style.display = 'block';
+            audioManager.playTopThree();
         } else {
             this.newHighScoreEl.style.display = 'none';
+            audioManager.playVictory();
         }
 
         this.showScreen(GameState.COMPLETE);
