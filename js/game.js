@@ -31,8 +31,19 @@ class WordHuntGame {
         this.gameStartTime = 0;
         this.timerInterval = null;
 
+        // Streak tracking
+        this.streak = 0;
+        this.wrongThisRound = false;
+
+        // Session tracking
+        this.currentSession = null;
+
+        // Dynamic distractor count for current word
+        this.currentDistractorCount = WORDS_PER_ROUND;
+
         this.initElements();
         this.bindEvents();
+        this.loadSettings();
     }
 
     initElements() {
@@ -72,6 +83,15 @@ class WordHuntGame {
         this.finalTimeEl = document.getElementById('final-time');
         this.leaderboardEl = document.getElementById('leaderboard');
         this.newHighScoreEl = document.getElementById('new-high-score');
+
+        // Streak element
+        this.streakEl = document.getElementById('streak-counter');
+
+        // Dashboard elements
+        this.dashboardScreen = document.getElementById('dashboard-screen');
+        this.dashboardBtn = document.getElementById('dashboard-btn');
+        this.dashboardBackBtn = document.getElementById('dashboard-back-btn');
+        this.dashboardResetBtn = document.getElementById('dashboard-reset-btn');
     }
 
     bindEvents() {
@@ -104,7 +124,44 @@ class WordHuntGame {
                 this.difficultyBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 this.difficulty = btn.dataset.difficulty;
+                ProgressTracker.updateSetting('lastDifficulty', this.difficulty);
             });
+        });
+
+        // Dashboard
+        if (this.dashboardBtn) {
+            this.dashboardBtn.addEventListener('click', () => {
+                audioManager.playClick();
+                this.showDashboard();
+            });
+        }
+        if (this.dashboardBackBtn) {
+            this.dashboardBackBtn.addEventListener('click', () => {
+                audioManager.playClick();
+                this.showScreen(GameState.START);
+            });
+        }
+        if (this.dashboardResetBtn) {
+            this.dashboardResetBtn.addEventListener('click', () => {
+                if (confirm('Reset all progress? This cannot be undone.')) {
+                    ProgressTracker.resetAllProgress();
+                    this.showDashboard(); // refresh
+                }
+            });
+        }
+    }
+
+    loadSettings() {
+        const settings = ProgressTracker.getSettings();
+
+        // Restore music preference
+        audioManager.musicEnabled = settings.musicEnabled;
+        this.updateMusicButton();
+
+        // Restore last difficulty
+        this.difficulty = settings.lastDifficulty || 'alphabet';
+        this.difficultyBtns.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.difficulty === this.difficulty);
         });
     }
 
@@ -117,6 +174,7 @@ class WordHuntGame {
     toggleMusic() {
         audioManager.toggleMusic();
         this.updateMusicButton();
+        ProgressTracker.updateSetting('musicEnabled', audioManager.musicEnabled);
     }
 
     updateMusicButton() {
@@ -136,7 +194,7 @@ class WordHuntGame {
     }
 
     showScreen(screenName) {
-        const screens = [this.startScreen, this.loadingScreen, this.gameScreen, this.completeScreen];
+        const screens = [this.startScreen, this.loadingScreen, this.gameScreen, this.completeScreen, this.dashboardScreen].filter(Boolean);
         screens.forEach(screen => screen.classList.remove('active'));
 
         switch (screenName) {
@@ -164,7 +222,7 @@ class WordHuntGame {
 
         this.showScreen(GameState.LOADING);
 
-        // Select words for this game
+        // Select words for this game (adaptive)
         this.selectGameWords();
 
         // Preload audio
@@ -176,8 +234,15 @@ class WordHuntGame {
         // Start playing
         this.currentWordIndex = 0;
         this.score = 0;
+        this.streak = 0;
+        this.wrongThisRound = false;
         this.scoreEl.textContent = '0';
+        this.updateStreakDisplay();
         this.totalWordsEl.textContent = WORDS_PER_GAME;
+
+        // Start session tracking
+        this.currentSession = ProgressTracker.startSession('word-hunt', this.difficulty);
+
         this.showScreen(GameState.PLAYING);
         this.startTimer();
         audioManager.startBackgroundMusic();
@@ -185,9 +250,7 @@ class WordHuntGame {
     }
 
     selectGameWords() {
-        const wordSet = WORD_SETS[this.difficulty];
-        const shuffled = this.shuffle([...wordSet]);
-        this.gameWords = shuffled.slice(0, WORDS_PER_GAME);
+        this.gameWords = ProgressTracker.selectAdaptiveWords(this.difficulty, WORDS_PER_GAME);
     }
 
     startTimer() {
@@ -254,6 +317,10 @@ class WordHuntGame {
         this.targetWord = this.gameWords[this.currentWordIndex];
         this.currentWordEl.textContent = this.currentWordIndex + 1;
         this.roundStartTime = Date.now();
+        this.wrongThisRound = false;
+
+        // Set dynamic distractor count based on word mastery
+        this.currentDistractorCount = ProgressTracker.getDistractorCount(this.targetWord);
 
         // Update display based on mode
         if (this.isAlphabetMode()) {
@@ -288,6 +355,7 @@ class WordHuntGame {
 
     selectDisplayedWords() {
         const wordSet = WORD_SETS[this.difficulty];
+        const totalButtons = this.currentDistractorCount;
 
         // Start with the target word
         const words = [this.targetWord];
@@ -296,7 +364,7 @@ class WordHuntGame {
         const available = wordSet.filter(w => w !== this.targetWord);
         const shuffled = this.shuffle([...available]);
 
-        while (words.length < WORDS_PER_ROUND && shuffled.length > 0) {
+        while (words.length < totalButtons && shuffled.length > 0) {
             words.push(shuffled.pop());
         }
 
@@ -308,12 +376,8 @@ class WordHuntGame {
         // Clear previous words
         this.wordArea.innerHTML = '';
 
-        // Get area dimensions
         const areaRect = this.wordArea.getBoundingClientRect();
-        const positions = [];
         const buttons = [];
-
-        const edgePadding = 8;
 
         // Create all buttons first to measure them
         this.displayedWords.forEach((word, index) => {
@@ -328,93 +392,94 @@ class WordHuntGame {
             buttons.push({ btn, word, index });
         });
 
-        // Position all buttons in a single rAF to avoid staggered placement
+        // Position using improved grid-jitter algorithm
         requestAnimationFrame(() => {
-            // Measure all buttons
             const measurements = buttons.map(({ btn }) => {
                 const rect = btn.getBoundingClientRect();
                 return { width: rect.width, height: rect.height };
             });
 
-            // Sort by size (place larger words first for better packing)
-            const indices = buttons.map((_, i) => i);
-            indices.sort((a, b) => {
-                const areaA = measurements[a].width * measurements[a].height;
-                const areaB = measurements[b].width * measurements[b].height;
-                return areaB - areaA;
-            });
+            const positions = this._gridJitterLayout(
+                areaRect.width, areaRect.height,
+                measurements
+            );
 
-            // Place each button
-            for (const idx of indices) {
-                const { btn } = buttons[idx];
-                const { width, height } = measurements[idx];
-
-                const maxX = Math.max(0, areaRect.width - width - edgePadding);
-                const maxY = Math.max(0, areaRect.height - height - edgePadding);
-
-                const position = this.findPosition(
-                    edgePadding, edgePadding, maxX, maxY,
-                    width, height, positions
-                );
-
-                positions.push({
-                    x: position.x,
-                    y: position.y,
-                    width: width,
-                    height: height
-                });
-
-                btn.style.left = `${position.x}px`;
-                btn.style.top = `${position.y}px`;
+            for (let i = 0; i < buttons.length; i++) {
+                const { btn } = buttons[i];
+                btn.style.left = `${positions[i].x}px`;
+                btn.style.top = `${positions[i].y}px`;
             }
         });
     }
 
-    findPosition(minX, minY, maxX, maxY, width, height, existing) {
-        // Shrink collision box to allow slight visual overlap of edges/shadows
-        // while ensuring text centers stay well separated and readable
-        const overlapAllowX = width * 0.2;
-        const overlapAllowY = height * 0.2;
+    /**
+     * Improved layout: compute grid cells then jitter within them.
+     * Guarantees no text-on-text overlap while feeling scattered.
+     */
+    _gridJitterLayout(areaW, areaH, measurements) {
+        const n = measurements.length;
+        const padding = 8;
 
-        const maxAttempts = 200;
-        let bestPosition = null;
-        let bestScore = -Infinity;
+        // Find average button size to compute grid dimensions
+        let avgW = 0, avgH = 0;
+        for (const m of measurements) { avgW += m.width; avgH += m.height; }
+        avgW /= n; avgH /= n;
 
-        for (let i = 0; i < maxAttempts; i++) {
-            const x = minX + Math.random() * Math.max(0, maxX - minX);
-            const y = minY + Math.random() * Math.max(0, maxY - minY);
+        // Determine grid cols/rows that fit the area
+        const cols = Math.max(2, Math.round(Math.sqrt(n * (areaW / areaH))));
+        const rows = Math.ceil(n / cols);
+        const cellW = areaW / cols;
+        const cellH = areaH / rows;
 
-            // Check overlap using shrunk collision boxes
-            const hasHeavyOverlap = existing.some(pos => {
-                return x + overlapAllowX < pos.x + pos.width - overlapAllowX &&
-                       x + width - overlapAllowX > pos.x + overlapAllowX &&
-                       y + overlapAllowY < pos.y + pos.height - overlapAllowY &&
-                       y + height - overlapAllowY > pos.y + overlapAllowY;
-            });
-
-            if (!hasHeavyOverlap) {
-                return { x, y };
-            }
-
-            // Track the position with the least total overlap for fallback
-            let totalOverlap = 0;
-            for (const pos of existing) {
-                const ox = Math.max(0, Math.min(x + width, pos.x + pos.width) - Math.max(x, pos.x));
-                const oy = Math.max(0, Math.min(y + height, pos.y + pos.height) - Math.max(y, pos.y));
-                totalOverlap += ox * oy;
-            }
-            const score = -totalOverlap;
-            if (score > bestScore) {
-                bestScore = score;
-                bestPosition = { x, y };
+        // Assign buttons to shuffled grid cells
+        const cells = [];
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                cells.push({ col: c, row: r });
             }
         }
+        // Shuffle cells so placement doesn't follow a grid pattern
+        for (let i = cells.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [cells[i], cells[j]] = [cells[j], cells[i]];
+        }
 
-        // Return the position with the least overlap
-        return bestPosition || {
-            x: Math.max(minX, Math.min(maxX, minX + Math.random() * Math.max(0, maxX - minX))),
-            y: Math.max(minY, Math.min(maxY, minY + Math.random() * Math.max(0, maxY - minY)))
-        };
+        // Sort buttons by area (larger first) for best cell assignment
+        const indices = measurements.map((_, i) => i);
+        indices.sort((a, b) => {
+            const areaA = measurements[a].width * measurements[a].height;
+            const areaB = measurements[b].width * measurements[b].height;
+            return areaB - areaA;
+        });
+
+        const positions = new Array(n);
+
+        for (let i = 0; i < n; i++) {
+            const idx = indices[i];
+            const { width, height } = measurements[idx];
+            const cell = cells[i];
+
+            // Cell boundaries
+            const cellLeft = cell.col * cellW;
+            const cellTop = cell.row * cellH;
+
+            // Jitter within the cell, keeping the button inside area bounds
+            const maxJitterX = Math.max(0, cellW - width - padding);
+            const maxJitterY = Math.max(0, cellH - height - padding);
+
+            const x = Math.min(
+                areaW - width - padding,
+                Math.max(padding, cellLeft + Math.random() * maxJitterX)
+            );
+            const y = Math.min(
+                areaH - height - padding,
+                Math.max(padding, cellTop + Math.random() * maxJitterY)
+            );
+
+            positions[idx] = { x, y };
+        }
+
+        return positions;
     }
 
     async handleWordClick(word, btn) {
@@ -432,12 +497,33 @@ class WordHuntGame {
         this.score += roundScore;
         this.scoreEl.textContent = this.score;
 
+        // Update streak
+        if (!this.wrongThisRound) {
+            this.streak++;
+            // Record correct in progress tracker
+            ProgressTracker.recordCorrect(this.targetWord, roundTime);
+        }
+        this.updateStreakDisplay();
+
+        // Record to session
+        if (this.currentSession) {
+            ProgressTracker.addSessionResult(
+                this.currentSession, this.targetWord,
+                !this.wrongThisRound, this.wrongThisRound ? 2 : 1, roundTime
+            );
+        }
+
         // Show points earned on the button area
         this.showPointsPopup(btn, roundScore);
 
         // Visual feedback
         btn.classList.add('correct');
         this.createStarBurst(btn);
+
+        // Streak milestone animation (3+ in a row)
+        if (this.streak >= 3 && !this.wrongThisRound) {
+            this.showStreakMilestone();
+        }
 
         // Play correct sound effect
         audioManager.playCorrect();
@@ -467,6 +553,15 @@ class WordHuntGame {
     }
 
     async handleWrong(btn) {
+        // Record wrong answer on first miss this round
+        if (!this.wrongThisRound) {
+            this.wrongThisRound = true;
+            this.streak = 0;
+            this.updateStreakDisplay();
+            const roundTime = Date.now() - this.roundStartTime;
+            ProgressTracker.recordWrong(this.targetWord, roundTime);
+        }
+
         // Visual feedback
         btn.classList.add('wrong');
 
@@ -504,6 +599,12 @@ class WordHuntGame {
         this.stopTimer();
         audioManager.stopBackgroundMusic();
         const totalTime = (Date.now() - this.gameStartTime) / 1000;
+
+        // End session tracking
+        if (this.currentSession) {
+            ProgressTracker.endSession(this.currentSession, this.score, totalTime);
+            this.currentSession = null;
+        }
 
         // Update message based on mode
         if (this.isAlphabetMode()) {
@@ -575,6 +676,131 @@ class WordHuntGame {
 
             this.confettiContainer.appendChild(confetti);
         }
+    }
+
+    // ── Streak display ──
+
+    updateStreakDisplay() {
+        if (!this.streakEl) return;
+        if (this.streak >= 2) {
+            this.streakEl.textContent = `${this.streak} in a row!`;
+            this.streakEl.style.display = '';
+            this.streakEl.classList.remove('streak-pop');
+            // trigger reflow to restart animation
+            void this.streakEl.offsetWidth;
+            this.streakEl.classList.add('streak-pop');
+        } else {
+            this.streakEl.style.display = 'none';
+        }
+    }
+
+    showStreakMilestone() {
+        if (!this.streakEl) return;
+        this.streakEl.classList.remove('streak-milestone');
+        void this.streakEl.offsetWidth;
+        this.streakEl.classList.add('streak-milestone');
+    }
+
+    // ── Parent dashboard ──
+
+    showDashboard() {
+        this.renderDashboard();
+        const screens = [this.startScreen, this.loadingScreen, this.gameScreen, this.completeScreen, this.dashboardScreen].filter(Boolean);
+        screens.forEach(s => s.classList.remove('active'));
+        if (this.dashboardScreen) {
+            this.dashboardScreen.classList.add('active');
+        }
+    }
+
+    renderDashboard() {
+        const container = document.getElementById('dashboard-content');
+        if (!container) return;
+
+        const progress = ProgressTracker.getProgress();
+        const status = ProgressTracker.getWordsByStatus();
+        const struggling = ProgressTracker.getStrugglingWords();
+        const sessions = ProgressTracker.getRecentSessions(10);
+        const totalTime = ProgressTracker.getTotalTimePlayed();
+
+        const formatTime = (s) => {
+            if (s < 60) return `${s}s`;
+            const m = Math.floor(s / 60);
+            const sec = s % 60;
+            if (m < 60) return `${m}m ${sec}s`;
+            const h = Math.floor(m / 60);
+            return `${h}h ${m % 60}m`;
+        };
+
+        const milestones = [10, 25, 50, 100];
+        const nextMilestone = milestones.find(m => m > progress.totalWordsLearned) || 'all';
+
+        let html = '';
+
+        // Summary stats
+        html += `<div class="dash-section">`;
+        html += `<h3>Overview</h3>`;
+        html += `<div class="dash-stats-grid">`;
+        html += `<div class="dash-stat"><div class="dash-stat-value">${progress.totalWordsLearned}</div><div class="dash-stat-label">Words Learned</div></div>`;
+        html += `<div class="dash-stat"><div class="dash-stat-value">${progress.totalSessions}</div><div class="dash-stat-label">Sessions</div></div>`;
+        html += `<div class="dash-stat"><div class="dash-stat-value">${formatTime(totalTime)}</div><div class="dash-stat-label">Time Played</div></div>`;
+        html += `<div class="dash-stat"><div class="dash-stat-value">${nextMilestone === 'all' ? 'Done!' : nextMilestone}</div><div class="dash-stat-label">Next Milestone</div></div>`;
+        html += `</div></div>`;
+
+        // Word status breakdown
+        html += `<div class="dash-section">`;
+        html += `<h3>Word Progress</h3>`;
+        html += `<div class="dash-bar">`;
+        const total = status.mastered.length + status.almostThere.length + status.practising.length + status.learning.length + status.unseen.length;
+        if (total > 0) {
+            const pct = (arr) => Math.round(arr.length / total * 100);
+            html += `<div class="dash-bar-seg mastered" style="width:${pct(status.mastered)}%" title="Mastered: ${status.mastered.length}"></div>`;
+            html += `<div class="dash-bar-seg almost" style="width:${pct(status.almostThere)}%" title="Almost: ${status.almostThere.length}"></div>`;
+            html += `<div class="dash-bar-seg practising" style="width:${pct(status.practising)}%" title="Practising: ${status.practising.length}"></div>`;
+            html += `<div class="dash-bar-seg learning" style="width:${pct(status.learning)}%" title="Learning: ${status.learning.length}"></div>`;
+            html += `<div class="dash-bar-seg unseen" style="width:${pct(status.unseen)}%" title="Unseen: ${status.unseen.length}"></div>`;
+        }
+        html += `</div>`;
+        html += `<div class="dash-legend">`;
+        html += `<span><i class="dot mastered"></i>Mastered (${status.mastered.length})</span>`;
+        html += `<span><i class="dot almost"></i>Almost (${status.almostThere.length})</span>`;
+        html += `<span><i class="dot practising"></i>Practising (${status.practising.length})</span>`;
+        html += `<span><i class="dot learning"></i>Learning (${status.learning.length})</span>`;
+        html += `<span><i class="dot unseen"></i>Unseen (${status.unseen.length})</span>`;
+        html += `</div></div>`;
+
+        // Struggling words
+        if (struggling.length > 0) {
+            html += `<div class="dash-section">`;
+            html += `<h3>Needs Practice</h3>`;
+            html += `<div class="dash-word-list">`;
+            for (const w of struggling.slice(0, 10)) {
+                const pct = w.attempts > 0 ? Math.round(w.correct / w.attempts * 100) : 0;
+                html += `<span class="dash-word struggling">${w.word} <small>${pct}%</small></span>`;
+            }
+            html += `</div></div>`;
+        }
+
+        // Recent sessions
+        if (sessions.length > 0) {
+            html += `<div class="dash-section">`;
+            html += `<h3>Recent Sessions</h3>`;
+            html += `<div class="dash-sessions">`;
+            for (const s of sessions) {
+                const d = new Date(s.date);
+                const dateStr = `${d.getMonth() + 1}/${d.getDate()}`;
+                const accuracy = s.wordsAttempted > 0 ? Math.round(s.wordsCorrect / s.wordsAttempted * 100) : 0;
+                html += `<div class="dash-session-row">`;
+                html += `<span class="dash-session-date">${dateStr}</span>`;
+                html += `<span class="dash-session-diff">${s.difficulty || ''}</span>`;
+                html += `<span class="dash-session-score">${s.score}</span>`;
+                html += `<span class="dash-session-acc">${accuracy}%</span>`;
+                html += `<span class="dash-session-time">${formatTime(s.totalTime)}</span>`;
+                html += `</div>`;
+            }
+            html += `</div></div>`;
+        }
+
+        container.innerHTML = html;
     }
 
     replayCurrentWord() {

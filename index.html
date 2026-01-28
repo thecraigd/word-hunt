@@ -35,6 +35,10 @@
                 <button class="difficulty-btn" data-difficulty="harder">Harder</button>
             </div>
             <button id="play-btn" class="play-btn">Play</button>
+            <button id="dashboard-btn" class="dashboard-btn" title="Parent Dashboard">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H5v-2h7v2zm5-4H5v-2h12v2zm0-4H5V7h12v2z"/></svg>
+                Stats
+            </button>
         </div>
 
         <!-- Loading Screen -->
@@ -84,6 +88,7 @@
                     <span class="stat-icon">⭐</span>
                     <span id="score" class="stat-value">0</span>
                 </div>
+                <div id="streak-counter" class="streak-counter" style="display:none"></div>
             </div>
             <div id="target-display" class="target-display">
                 <span id="target-label" class="target-label">Find the word:</span>
@@ -119,10 +124,26 @@
                 <button id="play-again-btn" class="play-btn">Play Again</button>
             </div>
         </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="screen">
+            <div class="dashboard-header">
+                <button id="dashboard-back-btn" class="back-btn" title="Back to menu">
+                    <svg viewBox="0 0 24 24" width="28" height="28">
+                        <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+                <h2 class="dashboard-title">Parent Dashboard</h2>
+                <div style="width:48px"></div>
+            </div>
+            <div id="dashboard-content" class="dashboard-content"></div>
+            <button id="dashboard-reset-btn" class="dashboard-reset-btn">Reset All Progress</button>
+        </div>
     </div>
 
     <script src="js/words.js"></script>
     <script src="js/audio.js"></script>
+    <script src="js/progress.js"></script>
     <script src="js/game.js"></script>
 </body>
 </html>
