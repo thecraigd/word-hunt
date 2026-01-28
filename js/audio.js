@@ -44,13 +44,16 @@ class AudioManager {
 
     /**
      * Preload audio files for a word set
+     * @param {string[]} words - Array of words/letters to preload
+     * @param {boolean} isAlphabet - If true, load from alphabet/ folder
      */
-    async preloadWords(words) {
+    async preloadWords(words, isAlphabet = false) {
         const loadPromises = [];
 
-        // Preload word prompts
+        // Preload word/letter prompts
+        const folder = isAlphabet ? 'alphabet' : 'find';
         for (const word of words) {
-            loadPromises.push(this.preloadAudio(`find/${word.toLowerCase()}`));
+            loadPromises.push(this.preloadAudio(`${folder}/${word.toLowerCase()}`));
         }
 
         // Preload victory phrases
@@ -106,6 +109,14 @@ class AudioManager {
     async playFindWord(word) {
         if (!this.audioEnabled) return;
         await this.playAudio(`find/${word.toLowerCase()}`);
+    }
+
+    /**
+     * Play audio for a letter (alphabet mode)
+     */
+    async playLetter(letter) {
+        if (!this.audioEnabled) return;
+        await this.playAudio(`alphabet/${letter.toLowerCase()}`);
     }
 
     /**

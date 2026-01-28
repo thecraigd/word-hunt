@@ -1,11 +1,17 @@
 /**
  * Word sets for Word Hunt game
  *
+ * Alphabet: Letters A-Z (audio only mode - target not displayed)
  * Easy: Dolch Pre-Primer sight words
  * Harder: Kindergarten Dolch + CVC words
  */
 
 const WORD_SETS = {
+    alphabet: [
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+        'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+        'U', 'V', 'W', 'X', 'Y', 'Z'
+    ],
     easy: [
         'the', 'a', 'I', 'is', 'it',
         'in', 'to', 'and', 'can', 'see',

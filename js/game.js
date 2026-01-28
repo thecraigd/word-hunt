@@ -40,14 +40,18 @@ class WordHuntGame {
         this.playBtn = document.getElementById('play-btn');
         this.playAgainBtn = document.getElementById('play-again-btn');
         this.replayAudioBtn = document.getElementById('replay-audio-btn');
+        this.backBtn = document.getElementById('back-btn');
         this.difficultyBtns = document.querySelectorAll('.difficulty-btn');
 
         // Game elements
         this.wordArea = document.getElementById('word-area');
+        this.targetDisplay = document.getElementById('target-display');
+        this.targetLabel = document.getElementById('target-label');
         this.targetWordEl = document.getElementById('target-word');
         this.currentWordEl = document.getElementById('current-word');
         this.totalWordsEl = document.getElementById('total-words');
         this.confettiContainer = document.getElementById('confetti-container');
+        this.completeMessage = document.getElementById('complete-message');
     }
 
     bindEvents() {
@@ -58,6 +62,9 @@ class WordHuntGame {
         // Replay audio button
         this.replayAudioBtn.addEventListener('click', () => this.replayCurrentWord());
 
+        // Back button
+        this.backBtn.addEventListener('click', () => this.goToMenu());
+
         // Difficulty buttons
         this.difficultyBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -66,6 +73,14 @@ class WordHuntGame {
                 this.difficulty = btn.dataset.difficulty;
             });
         });
+    }
+
+    goToMenu() {
+        this.showScreen(GameState.START);
+    }
+
+    isAlphabetMode() {
+        return this.difficulty === 'alphabet';
     }
 
     showScreen(screenName) {
@@ -100,7 +115,7 @@ class WordHuntGame {
         this.selectGameWords();
 
         // Preload audio
-        await audioManager.preloadWords(this.gameWords);
+        await audioManager.preloadWords(this.gameWords, this.isAlphabetMode());
 
         // Small delay for visual feedback
         await this.delay(500);
@@ -125,8 +140,18 @@ class WordHuntGame {
         }
 
         this.targetWord = this.gameWords[this.currentWordIndex];
-        this.targetWordEl.textContent = this.targetWord;
         this.currentWordEl.textContent = this.currentWordIndex + 1;
+
+        // Update display based on mode
+        if (this.isAlphabetMode()) {
+            this.targetDisplay.classList.add('audio-only');
+            this.targetLabel.textContent = 'Listen for the letter!';
+            this.targetWordEl.textContent = '';
+        } else {
+            this.targetDisplay.classList.remove('audio-only');
+            this.targetLabel.textContent = 'Find the word:';
+            this.targetWordEl.textContent = this.targetWord;
+        }
 
         // Select distractor words
         this.selectDisplayedWords();
@@ -136,8 +161,16 @@ class WordHuntGame {
 
         // Play audio after a short delay
         setTimeout(() => {
-            audioManager.playFindWord(this.targetWord);
+            this.playTargetAudio();
         }, 500);
+    }
+
+    playTargetAudio() {
+        if (this.isAlphabetMode()) {
+            audioManager.playLetter(this.targetWord);
+        } else {
+            audioManager.playFindWord(this.targetWord);
+        }
     }
 
     selectDisplayedWords() {
@@ -302,6 +335,13 @@ class WordHuntGame {
     }
 
     gameComplete() {
+        // Update message based on mode
+        if (this.isAlphabetMode()) {
+            this.completeMessage.textContent = 'You found all the letters!';
+        } else {
+            this.completeMessage.textContent = 'You found all the words!';
+        }
+
         this.showScreen(GameState.COMPLETE);
         this.createConfetti();
     }
@@ -324,7 +364,7 @@ class WordHuntGame {
     }
 
     replayCurrentWord() {
-        audioManager.playFindWord(this.targetWord);
+        this.playTargetAudio();
     }
 
     // Utility functions

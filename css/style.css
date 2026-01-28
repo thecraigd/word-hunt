@@ -196,6 +196,31 @@ body {
     margin-bottom: 10px;
 }
 
+.back-btn {
+    background: #E8E8E8;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 0 #CCCCCC;
+    transition: all 0.15s ease;
+}
+
+.back-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #CCCCCC;
+}
+
+.back-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #CCCCCC;
+}
+
 .progress {
     font-size: 28px;
     font-weight: 700;
@@ -248,6 +273,17 @@ body {
     font-size: 48px;
     font-weight: 800;
     color: var(--blue);
+}
+
+/* Alphabet mode - audio only, hide target */
+.target-display.audio-only .target-word {
+    display: none;
+}
+
+.target-display.audio-only .target-label {
+    margin-bottom: 0;
+    font-size: 28px;
+    color: var(--purple);
 }
 
 .word-area {
