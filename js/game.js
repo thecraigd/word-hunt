@@ -45,6 +45,7 @@ class WordHuntGame {
         // Buttons
         this.playBtn = document.getElementById('play-btn');
         this.playAgainBtn = document.getElementById('play-again-btn');
+        this.homeBtn = document.getElementById('home-btn');
         this.replayAudioBtn = document.getElementById('replay-audio-btn');
         this.backBtn = document.getElementById('back-btn');
         this.difficultyBtns = document.querySelectorAll('.difficulty-btn');
@@ -77,6 +78,10 @@ class WordHuntGame {
         // Play button
         this.playBtn.addEventListener('click', () => this.startGame());
         this.playAgainBtn.addEventListener('click', () => this.startGame());
+        this.homeBtn.addEventListener('click', () => {
+            audioManager.playClick();
+            this.showScreen(GameState.START);
+        });
 
         // Replay audio button
         this.replayAudioBtn.addEventListener('click', () => this.replayCurrentWord());
