@@ -1,0 +1,5 @@
+# Audio files (hosted on R2)
+audio/
+
+# macOS
+.DS_Store
