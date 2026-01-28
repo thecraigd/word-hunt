@@ -166,8 +166,9 @@ class WordHuntGame {
         const areaRect = this.wordArea.getBoundingClientRect();
         const positions = [];
 
-        // Minimum spacing between words
+        // Minimum spacing between words and edge padding
         const minSpacing = 24;
+        const edgePadding = 10;
 
         this.displayedWords.forEach((word, index) => {
             const btn = document.createElement('button');
@@ -182,9 +183,16 @@ class WordHuntGame {
             // Position after adding to DOM to get dimensions
             requestAnimationFrame(() => {
                 const btnRect = btn.getBoundingClientRect();
+
+                // Calculate valid positioning bounds (with edge padding)
+                const maxX = Math.max(0, areaRect.width - btnRect.width - edgePadding);
+                const maxY = Math.max(0, areaRect.height - btnRect.height - edgePadding);
+
                 const position = this.findPosition(
-                    areaRect.width - btnRect.width,
-                    areaRect.height - btnRect.height,
+                    edgePadding,
+                    edgePadding,
+                    maxX,
+                    maxY,
                     btnRect.width + minSpacing,
                     btnRect.height + minSpacing,
                     positions
@@ -203,12 +211,13 @@ class WordHuntGame {
         });
     }
 
-    findPosition(maxX, maxY, width, height, existing) {
+    findPosition(minX, minY, maxX, maxY, width, height, existing) {
         const maxAttempts = 100;
 
         for (let i = 0; i < maxAttempts; i++) {
-            const x = Math.random() * Math.max(0, maxX);
-            const y = Math.random() * Math.max(0, maxY);
+            // Generate random position within valid bounds
+            const x = minX + Math.random() * Math.max(0, maxX - minX);
+            const y = minY + Math.random() * Math.max(0, maxY - minY);
 
             // Check for overlaps
             const overlaps = existing.some(pos =>
@@ -223,10 +232,10 @@ class WordHuntGame {
             }
         }
 
-        // Fallback: just place it somewhere
+        // Fallback: clamp to valid bounds
         return {
-            x: Math.random() * Math.max(0, maxX),
-            y: Math.random() * Math.max(0, maxY)
+            x: Math.max(minX, Math.min(maxX, minX + Math.random() * Math.max(0, maxX - minX))),
+            y: Math.max(minY, Math.min(maxY, minY + Math.random() * Math.max(0, maxY - minY)))
         };
     }
 
@@ -243,13 +252,15 @@ class WordHuntGame {
         btn.classList.add('correct');
         this.createStarBurst(btn);
 
-        // Play sounds
+        // Play correct sound effect
         audioManager.playCorrect();
         await this.delay(300);
-        audioManager.playVictory();
 
-        // Wait for animation
-        await this.delay(700);
+        // Play victory phrase and wait for it to finish
+        await audioManager.playVictory();
+
+        // Small pause before next word
+        await this.delay(400);
 
         // Next word
         this.currentWordIndex++;

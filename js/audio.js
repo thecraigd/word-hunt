@@ -109,12 +109,12 @@ class AudioManager {
     }
 
     /**
-     * Play a random victory phrase
+     * Play a random victory phrase and wait for it to finish
      */
     async playVictory() {
         if (!this.audioEnabled) return;
         const phrase = VICTORY_PHRASES[Math.floor(Math.random() * VICTORY_PHRASES.length)];
-        await this.playAudio(`victory/${phrase}`);
+        await this.playAudioAndWait(`victory/${phrase}`);
     }
 
     /**
@@ -134,7 +134,7 @@ class AudioManager {
     }
 
     /**
-     * Play an audio file
+     * Play an audio file (starts playback, doesn't wait for completion)
      */
     async playAudio(path) {
         const cached = this.audioCache.get(path);
@@ -156,6 +156,38 @@ class AudioManager {
                 console.log('Audio play failed:', e);
             }
         }
+    }
+
+    /**
+     * Play an audio file and wait for it to finish
+     */
+    async playAudioAndWait(path) {
+        const cached = this.audioCache.get(path);
+        const audio = cached || new Audio(`${AUDIO_BASE_URL}/${path}.mp3`);
+
+        return new Promise((resolve) => {
+            const onEnded = () => {
+                audio.removeEventListener('ended', onEnded);
+                resolve();
+            };
+
+            audio.addEventListener('ended', onEnded);
+
+            try {
+                audio.currentTime = 0;
+                audio.play().catch(() => resolve());
+
+                if (!cached) {
+                    this.audioCache.set(path, audio);
+                }
+            } catch (e) {
+                console.log('Audio play failed:', e);
+                resolve();
+            }
+
+            // Fallback timeout in case 'ended' never fires
+            setTimeout(resolve, 5000);
+        });
     }
 
     /**
