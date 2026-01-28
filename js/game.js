@@ -19,7 +19,7 @@ const COLORS = ['coral', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 
 class WordHuntGame {
     constructor() {
         this.state = GameState.START;
-        this.difficulty = 'easy';
+        this.difficulty = 'alphabet';
         this.currentWordIndex = 0;
         this.targetWord = '';
         this.gameWords = [];
