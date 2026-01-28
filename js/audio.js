@@ -8,7 +8,18 @@
 const AUDIO_BASE_URL = 'https://pub-39b6eccef9ff4f43a7db37a762a6e6d8.r2.dev/word-hunt/audio';
 
 // Victory phrases available
-const VICTORY_PHRASES = ['great-job', 'well-done', 'you-did-it', 'excellent'];
+const VICTORY_PHRASES = [
+    'excellent',
+    'great-job',
+    'great-job-2',
+    'victory1',
+    'victory2',
+    'victory3',
+    'victory4',
+    'victory5',
+    'well-done',
+    'you-did-it'
+];
 
 class AudioManager {
     constructor() {
