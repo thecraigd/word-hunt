@@ -107,6 +107,8 @@ body {
 
 .difficulty-selector {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 16px;
     margin-bottom: 40px;
 }
@@ -698,8 +700,8 @@ body {
     }
 
     .difficulty-btn {
-        font-size: 20px;
-        padding: 12px 24px;
+        font-size: 18px;
+        padding: 10px 18px;
     }
 
     .play-btn {

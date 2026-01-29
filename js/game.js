@@ -193,6 +193,14 @@ class WordHuntGame {
         return this.difficulty === 'alphabet';
     }
 
+    isSoundMatchMode() {
+        return this.difficulty === 'sound-match';
+    }
+
+    isLetterMode() {
+        return this.isAlphabetMode() || this.isSoundMatchMode();
+    }
+
     showScreen(screenName) {
         const screens = [this.startScreen, this.loadingScreen, this.gameScreen, this.completeScreen, this.dashboardScreen].filter(Boolean);
         screens.forEach(screen => screen.classList.remove('active'));
@@ -226,7 +234,10 @@ class WordHuntGame {
         this.selectGameWords();
 
         // Preload audio
-        await audioManager.preloadWords(this.gameWords, this.isAlphabetMode());
+        const audioMode = this.isSoundMatchMode() ? 'sound-match'
+                        : this.isAlphabetMode() ? 'alphabet'
+                        : 'words';
+        await audioManager.preloadWords(this.gameWords, audioMode);
 
         // Small delay for visual feedback
         await this.delay(500);
@@ -323,9 +334,11 @@ class WordHuntGame {
         this.currentDistractorCount = ProgressTracker.getDistractorCount(this.targetWord);
 
         // Update display based on mode
-        if (this.isAlphabetMode()) {
+        if (this.isLetterMode()) {
             this.targetDisplay.classList.add('audio-only');
-            this.targetLabel.textContent = 'Listen for the letter!';
+            this.targetLabel.textContent = this.isSoundMatchMode()
+                ? 'Listen for the sound!'
+                : 'Listen for the letter!';
             this.targetWordEl.textContent = '';
         } else {
             this.targetDisplay.classList.remove('audio-only');
@@ -346,7 +359,9 @@ class WordHuntGame {
     }
 
     playTargetAudio() {
-        if (this.isAlphabetMode()) {
+        if (this.isSoundMatchMode()) {
+            audioManager.playSoundMatchPrompt(this.targetWord);
+        } else if (this.isAlphabetMode()) {
             audioManager.playLetter(this.targetWord);
         } else {
             audioManager.playFindWord(this.targetWord);
@@ -607,7 +622,9 @@ class WordHuntGame {
         }
 
         // Update message based on mode
-        if (this.isAlphabetMode()) {
+        if (this.isSoundMatchMode()) {
+            this.completeMessage.textContent = 'You matched all the sounds!';
+        } else if (this.isAlphabetMode()) {
             this.completeMessage.textContent = 'You found all the letters!';
         } else {
             this.completeMessage.textContent = 'You found all the words!';

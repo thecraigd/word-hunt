@@ -67,15 +67,24 @@ class AudioManager {
     /**
      * Preload audio files for a word set
      * @param {string[]} words - Array of words/letters to preload
-     * @param {boolean} isAlphabet - If true, load from alphabet/ folder
+     * @param {string} mode - 'words', 'alphabet', or 'sound-match'
      */
-    async preloadWords(words, isAlphabet = false) {
+    async preloadWords(words, mode = 'words') {
         const loadPromises = [];
 
         // Preload word/letter prompts
-        const folder = isAlphabet ? 'alphabet' : 'find';
-        for (const word of words) {
-            loadPromises.push(this.preloadAudio(`${folder}/${word.toLowerCase()}`));
+        if (mode === 'sound-match') {
+            for (const word of words) {
+                const letter = word.toLowerCase();
+                loadPromises.push(this.preloadAudio(`sound-match/${letter}`));
+                loadPromises.push(this.preloadAudio(`phonemes/${letter}`));
+                loadPromises.push(this.preloadAudio(`keywords/${letter}`));
+            }
+        } else {
+            const folder = mode === 'alphabet' ? 'alphabet' : 'find';
+            for (const word of words) {
+                loadPromises.push(this.preloadAudio(`${folder}/${word.toLowerCase()}`));
+            }
         }
 
         // Preload victory phrases
@@ -149,6 +158,30 @@ class AudioManager {
     async playLetter(letter) {
         if (!this.audioEnabled) return;
         await this.playAudio(`alphabet/${letter.toLowerCase()}`);
+    }
+
+    /**
+     * Play sound-match prompt for a letter ("What letter makes the /s/ sound?")
+     */
+    async playSoundMatchPrompt(letter) {
+        if (!this.audioEnabled) return;
+        await this.playAudio(`sound-match/${letter.toLowerCase()}`);
+    }
+
+    /**
+     * Play raw phoneme sound for a letter
+     */
+    async playPhoneme(letter) {
+        if (!this.audioEnabled) return;
+        await this.playAudio(`phonemes/${letter.toLowerCase()}`);
+    }
+
+    /**
+     * Play keyword audio for a letter ("s is for snake")
+     */
+    async playKeyword(letter) {
+        if (!this.audioEnabled) return;
+        await this.playAudio(`keywords/${letter.toLowerCase()}`);
     }
 
     /**

@@ -12,6 +12,11 @@ const WORD_SETS = {
         'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
         'U', 'V', 'W', 'X', 'Y', 'Z'
     ],
+    'sound-match': [
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+        'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+        'U', 'V', 'W', 'X', 'Y', 'Z'
+    ],
     easy: [
         'the', 'a', 'I', 'is', 'it',
         'in', 'to', 'and', 'can', 'see',
