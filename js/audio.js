@@ -67,13 +67,23 @@ class AudioManager {
     /**
      * Preload audio files for a word set
      * @param {string[]} words - Array of words/letters to preload
-     * @param {string} mode - 'words', 'alphabet', or 'sound-match'
+     * @param {string} mode - 'words', 'alphabet', 'sound-match', or 'word-builder'
      */
     async preloadWords(words, mode = 'words') {
         const loadPromises = [];
 
         // Preload word/letter prompts
-        if (mode === 'sound-match') {
+        if (mode === 'word-builder') {
+            for (const word of words) {
+                const w = word.toLowerCase();
+                loadPromises.push(this.preloadAudio(`segment/${w}`));
+                loadPromises.push(this.preloadAudio(`blend/${w}`));
+            }
+            // Preload builder prompt phrases
+            for (let i = 1; i <= 5; i++) {
+                loadPromises.push(this.preloadAudio(`word-builder/prompt-${i}`));
+            }
+        } else if (mode === 'sound-match') {
             for (const word of words) {
                 const letter = word.toLowerCase();
                 loadPromises.push(this.preloadAudio(`sound-match/${letter}`));
@@ -182,6 +192,31 @@ class AudioManager {
     async playKeyword(letter) {
         if (!this.audioEnabled) return;
         await this.playAudio(`keywords/${letter.toLowerCase()}`);
+    }
+
+    /**
+     * Play segmented phoneme audio for a word (word builder mode)
+     */
+    async playSegmented(word) {
+        if (!this.audioEnabled) return;
+        await this.playAudioAndWait(`segment/${word.toLowerCase()}`);
+    }
+
+    /**
+     * Play blended word celebration audio (word builder mode)
+     */
+    async playBlend(word) {
+        if (!this.audioEnabled) return;
+        await this.playAudioAndWait(`blend/${word.toLowerCase()}`);
+    }
+
+    /**
+     * Play a random builder prompt phrase (word builder mode)
+     */
+    async playBuilderPrompt() {
+        if (!this.audioEnabled) return;
+        const n = Math.floor(Math.random() * 5) + 1;
+        await this.playAudioAndWait(`word-builder/prompt-${n}`);
     }
 
     /**

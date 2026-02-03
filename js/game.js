@@ -41,6 +41,13 @@ class WordHuntGame {
         // Dynamic distractor count for current word
         this.currentDistractorCount = WORDS_PER_ROUND;
 
+        // Word builder state
+        this.builderState = {
+            letters: [],
+            currentIndex: 0,
+            placedLetters: []
+        };
+
         this.initElements();
         this.bindEvents();
         this.loadSettings();
@@ -62,6 +69,7 @@ class WordHuntGame {
         this.difficultyBtns = document.querySelectorAll('.difficulty-btn');
 
         // Game elements
+        this.buildingZone = document.getElementById('building-zone');
         this.wordArea = document.getElementById('word-area');
         this.targetDisplay = document.getElementById('target-display');
         this.targetLabel = document.getElementById('target-label');
@@ -168,6 +176,7 @@ class WordHuntGame {
     goToMenu() {
         this.stopTimer();
         audioManager.stopBackgroundMusic();
+        this.buildingZone.style.display = 'none';
         this.showScreen(GameState.START);
     }
 
@@ -199,6 +208,10 @@ class WordHuntGame {
 
     isLetterMode() {
         return this.isAlphabetMode() || this.isSoundMatchMode();
+    }
+
+    isWordBuilderMode() {
+        return this.difficulty === 'word-builder';
     }
 
     showScreen(screenName) {
@@ -234,7 +247,8 @@ class WordHuntGame {
         this.selectGameWords();
 
         // Preload audio
-        const audioMode = this.isSoundMatchMode() ? 'sound-match'
+        const audioMode = this.isWordBuilderMode() ? 'word-builder'
+                        : this.isSoundMatchMode() ? 'sound-match'
                         : this.isAlphabetMode() ? 'alphabet'
                         : 'words';
         await audioManager.preloadWords(this.gameWords, audioMode);
@@ -333,6 +347,18 @@ class WordHuntGame {
         // Set dynamic distractor count based on word mastery
         this.currentDistractorCount = ProgressTracker.getDistractorCount(this.targetWord);
 
+        if (this.isWordBuilderMode()) {
+            // Word Builder mode
+            this.targetDisplay.classList.add('audio-only');
+            this.targetLabel.textContent = 'Build the word!';
+            this.targetWordEl.textContent = '';
+            this.showBuildingZone();
+            return;
+        }
+
+        // Hide building zone for non-builder modes
+        this.buildingZone.style.display = 'none';
+
         // Update display based on mode
         if (this.isLetterMode()) {
             this.targetDisplay.classList.add('audio-only');
@@ -358,8 +384,11 @@ class WordHuntGame {
         }, 500);
     }
 
-    playTargetAudio() {
-        if (this.isSoundMatchMode()) {
+    async playTargetAudio() {
+        if (this.isWordBuilderMode()) {
+            await audioManager.playBuilderPrompt();
+            await audioManager.playSegmented(this.targetWord);
+        } else if (this.isSoundMatchMode()) {
             audioManager.playSoundMatchPrompt(this.targetWord);
         } else if (this.isAlphabetMode()) {
             audioManager.playLetter(this.targetWord);
@@ -621,8 +650,13 @@ class WordHuntGame {
             this.currentSession = null;
         }
 
+        // Hide building zone
+        this.buildingZone.style.display = 'none';
+
         // Update message based on mode
-        if (this.isSoundMatchMode()) {
+        if (this.isWordBuilderMode()) {
+            this.completeMessage.textContent = 'You built all the words!';
+        } else if (this.isSoundMatchMode()) {
             this.completeMessage.textContent = 'You matched all the sounds!';
         } else if (this.isAlphabetMode()) {
             this.completeMessage.textContent = 'You found all the letters!';
@@ -716,6 +750,210 @@ class WordHuntGame {
         this.streakEl.classList.remove('streak-milestone');
         void this.streakEl.offsetWidth;
         this.streakEl.classList.add('streak-milestone');
+    }
+
+    // ── Word Builder mode ──
+
+    showBuildingZone() {
+        const wordData = WORD_BUILDER_DATA[this.targetWord.toLowerCase()];
+        if (!wordData) return;
+
+        const letters = wordData.letters;
+        this.builderState = {
+            letters: letters,
+            currentIndex: 0,
+            placedLetters: []
+        };
+
+        // Show building zone with empty slots
+        this.buildingZone.style.display = 'flex';
+        this.buildingZone.innerHTML = '';
+        letters.forEach((_, i) => {
+            const slot = document.createElement('div');
+            slot.className = 'letter-slot';
+            slot.dataset.index = i;
+            if (i === 0) slot.classList.add('active');
+            this.buildingZone.appendChild(slot);
+        });
+
+        // Render letter tiles in the word area
+        this.renderLetterTiles(letters);
+
+        // Play prompt + segmented audio
+        setTimeout(() => {
+            this.playTargetAudio();
+        }, 500);
+    }
+
+    renderLetterTiles(wordLetters) {
+        this.wordArea.innerHTML = '';
+
+        // Determine how many tiles total using distractor system
+        const distractorCount = Math.max(3, this.currentDistractorCount - wordLetters.length);
+        const totalTiles = wordLetters.length + distractorCount;
+
+        // Pick distractor letters (not in the word, from alphabet)
+        const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+        const wordLetterSet = new Set(wordLetters.map(l => l.toLowerCase()));
+        const available = alphabet.filter(l => !wordLetterSet.has(l));
+
+        const distractors = this.shuffle([...available]).slice(0, distractorCount);
+        const allLetters = this.shuffle([...wordLetters, ...distractors]);
+
+        const areaRect = this.wordArea.getBoundingClientRect();
+        const buttons = [];
+
+        allLetters.forEach((letter, index) => {
+            const btn = document.createElement('button');
+            btn.className = `letter-tile ${COLORS[index % COLORS.length]}`;
+            btn.textContent = letter.toUpperCase();
+            btn.style.animationDelay = `${index * 0.06}s`;
+            btn.dataset.letter = letter.toLowerCase();
+
+            btn.addEventListener('click', () => this.handleLetterClick(letter.toLowerCase(), btn));
+
+            this.wordArea.appendChild(btn);
+            buttons.push({ btn, letter, index });
+        });
+
+        // Position using grid-jitter layout
+        requestAnimationFrame(() => {
+            const measurements = buttons.map(({ btn }) => {
+                const rect = btn.getBoundingClientRect();
+                return { width: rect.width, height: rect.height };
+            });
+
+            const positions = this._gridJitterLayout(
+                areaRect.width, areaRect.height,
+                measurements
+            );
+
+            for (let i = 0; i < buttons.length; i++) {
+                const { btn } = buttons[i];
+                btn.style.left = `${positions[i].x}px`;
+                btn.style.top = `${positions[i].y}px`;
+            }
+        });
+    }
+
+    async handleLetterClick(letter, btn) {
+        const expected = this.builderState.letters[this.builderState.currentIndex];
+
+        if (letter === expected.toLowerCase()) {
+            // Correct letter
+            await this.animateFlyToSlot(btn, this.builderState.currentIndex);
+
+            this.builderState.placedLetters.push(letter);
+            this.builderState.currentIndex++;
+
+            // Update active slot indicator
+            const slots = this.buildingZone.querySelectorAll('.letter-slot');
+            slots.forEach((slot, i) => {
+                slot.classList.remove('active');
+                if (i === this.builderState.currentIndex) {
+                    slot.classList.add('active');
+                }
+            });
+
+            // Check if word is complete
+            if (this.builderState.currentIndex >= this.builderState.letters.length) {
+                await this.onWordBuilt();
+            }
+        } else {
+            // Wrong letter
+            if (!this.wrongThisRound) {
+                this.wrongThisRound = true;
+                this.streak = 0;
+                this.updateStreakDisplay();
+                const roundTime = Date.now() - this.roundStartTime;
+                ProgressTracker.recordWrong(this.targetWord, roundTime);
+            }
+
+            btn.classList.add('wrong');
+            audioManager.playTryAgain();
+            await this.delay(500);
+            btn.classList.remove('wrong');
+        }
+    }
+
+    async animateFlyToSlot(tileBtn, slotIndex) {
+        const slot = this.buildingZone.querySelectorAll('.letter-slot')[slotIndex];
+        if (!slot) return;
+
+        const tileRect = tileBtn.getBoundingClientRect();
+        const slotRect = slot.getBoundingClientRect();
+
+        // Calculate delta for CSS custom properties
+        const dx = slotRect.left + slotRect.width / 2 - (tileRect.left + tileRect.width / 2);
+        const dy = slotRect.top + slotRect.height / 2 - (tileRect.top + tileRect.height / 2);
+
+        tileBtn.style.setProperty('--fly-x', `${dx}px`);
+        tileBtn.style.setProperty('--fly-y', `${dy}px`);
+        tileBtn.classList.add('flying');
+
+        // Play click sound
+        audioManager.playClick();
+
+        await this.delay(400);
+
+        // Hide the tile and fill the slot
+        tileBtn.classList.remove('flying');
+        tileBtn.classList.add('used');
+
+        const color = COLORS[slotIndex % COLORS.length];
+        slot.classList.add('filled', color);
+        slot.textContent = tileBtn.textContent;
+        slot.classList.add('celebrate');
+        setTimeout(() => slot.classList.remove('celebrate'), 400);
+    }
+
+    async onWordBuilt() {
+        // Calculate round score
+        const roundTime = Date.now() - this.roundStartTime;
+        const roundScore = this.calculateRoundScore(roundTime);
+        this.score += roundScore;
+        this.scoreEl.textContent = this.score;
+
+        // Update streak
+        if (!this.wrongThisRound) {
+            this.streak++;
+            ProgressTracker.recordCorrect(this.targetWord, roundTime);
+        }
+        this.updateStreakDisplay();
+
+        // Record to session
+        if (this.currentSession) {
+            ProgressTracker.addSessionResult(
+                this.currentSession, this.targetWord,
+                !this.wrongThisRound, this.wrongThisRound ? 2 : 1, roundTime
+            );
+        }
+
+        // Show points popup on last slot
+        const lastSlot = this.buildingZone.querySelector('.letter-slot:last-child');
+        if (lastSlot) {
+            this.showPointsPopup(lastSlot, roundScore);
+        }
+
+        // Streak milestone
+        if (this.streak >= 3 && !this.wrongThisRound) {
+            this.showStreakMilestone();
+        }
+
+        // Play correct sound
+        audioManager.playCorrect();
+        await this.delay(300);
+
+        // Play blended word celebration
+        await audioManager.playBlend(this.targetWord);
+
+        // Play victory phrase
+        await audioManager.playVictory();
+        await this.delay(400);
+
+        // Next word
+        this.currentWordIndex++;
+        this.showNextWord();
     }
 
     // ── Parent dashboard ──
@@ -821,7 +1059,11 @@ class WordHuntGame {
     }
 
     replayCurrentWord() {
-        this.playTargetAudio();
+        if (this.isWordBuilderMode()) {
+            audioManager.playSegmented(this.targetWord);
+        } else {
+            this.playTargetAudio();
+        }
     }
 
     // Utility functions

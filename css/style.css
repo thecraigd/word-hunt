@@ -1085,6 +1085,178 @@ body {
     color: var(--coral);
 }
 
+/* ===== Word Builder Mode ===== */
+
+/* Building zone — row of letter slots at top of play area */
+.building-zone {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    min-height: 72px;
+}
+
+.letter-slot {
+    width: 64px;
+    height: 64px;
+    border: 3px dashed #CCC;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Nunito', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: white;
+    background: transparent;
+    transition: border-color 0.2s ease, background-color 0.3s ease;
+}
+
+.letter-slot.active {
+    border-color: var(--blue);
+    border-style: solid;
+    box-shadow: 0 0 12px rgba(84, 160, 255, 0.3);
+}
+
+.letter-slot.filled {
+    border-style: solid;
+    border-color: transparent;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+}
+
+.letter-slot.filled.coral { background-color: var(--coral); border-color: var(--coral); }
+.letter-slot.filled.orange { background-color: var(--orange); border-color: var(--orange); }
+.letter-slot.filled.green { background-color: var(--green); border-color: var(--green); }
+.letter-slot.filled.blue { background-color: var(--blue); border-color: var(--blue); }
+.letter-slot.filled.purple { background-color: var(--purple); border-color: var(--purple); }
+.letter-slot.filled.pink { background-color: var(--pink); border-color: var(--pink); }
+.letter-slot.filled.teal { background-color: var(--teal); border-color: var(--teal); }
+
+/* Letter tile buttons (single letters scattered in word-area) */
+.letter-tile {
+    position: absolute;
+    font-family: 'Nunito', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    width: 64px;
+    height: 64px;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: wordBounceIn 0.5s ease forwards;
+}
+
+.letter-tile:hover {
+    transform: scale(1.12) translateY(-3px);
+    box-shadow: 0 10px 0 rgba(0, 0, 0, 0.2);
+}
+
+.letter-tile:active {
+    transform: scale(1.02) translateY(4px);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Reuse word-btn color classes */
+.letter-tile.coral { background-color: var(--coral); }
+.letter-tile.orange { background-color: var(--orange); }
+.letter-tile.yellow { background-color: var(--yellow); color: #5D4037; }
+.letter-tile.green { background-color: var(--green); }
+.letter-tile.blue { background-color: var(--blue); }
+.letter-tile.purple { background-color: var(--purple); }
+.letter-tile.pink { background-color: var(--pink); }
+.letter-tile.teal { background-color: var(--teal); }
+
+.letter-tile.used {
+    opacity: 0.3;
+    pointer-events: none;
+    transform: scale(0.8);
+    box-shadow: none;
+}
+
+.letter-tile.wrong {
+    animation: shake var(--shake-duration) ease;
+}
+
+/* Fly-to-slot animation */
+@keyframes flyToSlot {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    60% {
+        transform: translate(var(--fly-x), var(--fly-y)) scale(1.15);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--fly-x), var(--fly-y)) scale(1);
+        opacity: 0;
+    }
+}
+
+.letter-tile.flying {
+    animation: flyToSlot 0.4s ease forwards;
+    pointer-events: none;
+    z-index: 20;
+}
+
+/* Word builder completion glow */
+@keyframes slotCelebrate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+.letter-slot.celebrate {
+    animation: slotCelebrate 0.4s ease;
+}
+
+@media (max-width: 600px) {
+    .letter-slot {
+        width: 52px;
+        height: 52px;
+        font-size: 28px;
+    }
+
+    .letter-tile {
+        width: 52px;
+        height: 52px;
+        font-size: 28px;
+    }
+
+    .building-zone {
+        gap: 8px;
+        min-height: 60px;
+    }
+}
+
+@media (max-height: 600px) {
+    .letter-slot {
+        width: 48px;
+        height: 48px;
+        font-size: 26px;
+    }
+
+    .letter-tile {
+        width: 48px;
+        height: 48px;
+        font-size: 26px;
+    }
+
+    .building-zone {
+        gap: 6px;
+        min-height: 54px;
+        margin-bottom: 8px;
+    }
+}
+
 /* Landscape tablet/desktop optimization */
 @media (min-width: 768px) and (orientation: landscape) {
     .word-area {

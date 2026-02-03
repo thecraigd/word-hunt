@@ -693,3 +693,158 @@ For reference when expanding word lists beyond CVC:
 10. **Multisyllabic Words** — sunset, jumping
 
 Key principles: start with continuous consonants (m, s, n, f, l, r) because they can be stretched for blending. Use connected phonation ("mmmmaaaat" not "m…a…t"). Cumulative review is essential.
+
+---
+
+## Appendix E: Word Builder (Phase 3) — Complete Audio Recording Scripts
+
+This appendix provides exact recording scripts for all 65 audio files needed for the Word Builder game mode. All files should be recorded in dad's voice, saved as MP3, and uploaded to the R2 CDN.
+
+### E.1 Recording Tips Specific to Word Builder
+
+**Phoneme segmentation pacing:**
+- Leave approximately 0.5–0.8 seconds of silence between each phoneme
+- Stretch continuous consonants (f, l, m, n, r, s, v, w, z) for about 0.5 seconds each
+- Keep stop consonants (b, c/k, d, g, h, j, p, t) crisp and short — do NOT add a schwa vowel (say "b" not "buh", "t" not "tuh")
+- Vowels should be clear and slightly elongated
+
+**Blended word recordings:**
+- Say the word naturally and enthusiastically, as if celebrating
+- Slightly emphasise the word — it's the payoff moment
+
+**General:**
+- Warm, encouraging tone throughout
+- Consistent volume and distance from microphone
+- Record in a quiet room, same as previous sessions
+
+### E.2 Segmented Word Recordings (30 files)
+
+**Folder:** `audio/segment/`
+**Format:** `[word].mp3`
+**What to say:** Each phoneme separately, with ~0.5s pauses between them. Stretch continuous sounds. Keep stop sounds crisp.
+
+#### Group 1 — Continuous Consonant Words (easiest to blend)
+
+| # | File | Script | Phoneme Notes |
+|---|------|--------|---------------|
+| 1 | `segment/sat.mp3` | "sss ... aaa ... t" | Stretch the /s/, clear /a/ as in "cat", crisp /t/ |
+| 2 | `segment/man.mp3` | "mmm ... aaa ... nnn" | Stretch /m/, clear /a/, stretch /n/ |
+| 3 | `segment/fan.mp3` | "fff ... aaa ... nnn" | Stretch /f/, clear /a/, stretch /n/ |
+| 4 | `segment/sun.mp3` | "sss ... uuu ... nnn" | Stretch /s/, /u/ as in "up", stretch /n/ |
+| 5 | `segment/fin.mp3` | "fff ... iii ... nnn" | Stretch /f/, /i/ as in "sit", stretch /n/ |
+| 6 | `segment/van.mp3` | "vvv ... aaa ... nnn" | Stretch /v/, clear /a/, stretch /n/ |
+| 7 | `segment/run.mp3` | "rrr ... uuu ... nnn" | Stretch /r/, /u/ as in "up", stretch /n/ |
+| 8 | `segment/fun.mp3` | "fff ... uuu ... nnn" | Stretch /f/, /u/ as in "up", stretch /n/ |
+| 9 | `segment/win.mp3` | "www ... iii ... nnn" | Stretch /w/, /i/ as in "sit", stretch /n/ |
+| 10 | `segment/ran.mp3` | "rrr ... aaa ... nnn" | Stretch /r/, clear /a/, stretch /n/ |
+
+#### Group 2 — Stop Consonant Words
+
+| # | File | Script | Phoneme Notes |
+|---|------|--------|---------------|
+| 11 | `segment/cat.mp3` | "c ... aaa ... t" | Crisp /k/ sound (no "kuh"), clear /a/, crisp /t/ |
+| 12 | `segment/bat.mp3` | "b ... aaa ... t" | Crisp /b/ (no "buh"), clear /a/, crisp /t/ |
+| 13 | `segment/hat.mp3` | "h ... aaa ... t" | Quick /h/ breath, clear /a/, crisp /t/ |
+| 14 | `segment/dog.mp3` | "d ... ooo ... g" | Crisp /d/, /o/ as in "hot", crisp /g/ |
+| 15 | `segment/big.mp3` | "b ... iii ... g" | Crisp /b/, /i/ as in "sit", crisp /g/ |
+| 16 | `segment/bed.mp3` | "b ... eee ... d" | Crisp /b/, /e/ as in "red", crisp /d/ |
+| 17 | `segment/bug.mp3` | "b ... uuu ... g" | Crisp /b/, /u/ as in "up", crisp /g/ |
+| 18 | `segment/cup.mp3` | "c ... uuu ... p" | Crisp /k/ sound, /u/ as in "up", crisp /p/ |
+| 19 | `segment/pot.mp3` | "p ... ooo ... t" | Crisp /p/, /o/ as in "hot", crisp /t/ |
+| 20 | `segment/pig.mp3` | "p ... iii ... g" | Crisp /p/, /i/ as in "sit", crisp /g/ |
+
+#### Group 3 — Mixed Consonant Words
+
+| # | File | Script | Phoneme Notes |
+|---|------|--------|---------------|
+| 21 | `segment/red.mp3` | "rrr ... eee ... d" | Stretch /r/, /e/ as in "red", crisp /d/ |
+| 22 | `segment/log.mp3` | "lll ... ooo ... g" | Stretch /l/, /o/ as in "hot", crisp /g/ |
+| 23 | `segment/zip.mp3` | "zzz ... iii ... p" | Stretch /z/, /i/ as in "sit", crisp /p/ |
+| 24 | `segment/fox.mp3` | "fff ... ooo ... ks" | Stretch /f/, /o/ as in "hot", /ks/ said quickly together |
+| 25 | `segment/wet.mp3` | "www ... eee ... t" | Stretch /w/, /e/ as in "red", crisp /t/ |
+| 26 | `segment/hop.mp3` | "h ... ooo ... p" | Quick /h/ breath, /o/ as in "hot", crisp /p/ |
+| 27 | `segment/jet.mp3` | "j ... eee ... t" | Crisp /j/, /e/ as in "red", crisp /t/ |
+| 28 | `segment/tag.mp3` | "t ... aaa ... g" | Crisp /t/, clear /a/, crisp /g/ |
+| 29 | `segment/kid.mp3` | "c ... iii ... d" | Crisp /k/ sound (same as "cat"), /i/ as in "sit", crisp /d/ |
+| 30 | `segment/mud.mp3` | "mmm ... uuu ... d" | Stretch /m/, /u/ as in "up", crisp /d/ |
+
+### E.3 Blended Word Confirmation Recordings (30 files)
+
+**Folder:** `audio/blend/`
+**Format:** `[word].mp3`
+**What to say:** The word said clearly and enthusiastically — this is the celebration moment after the child builds the word successfully.
+
+| # | File | Script | Delivery Notes |
+|---|------|--------|----------------|
+| 1 | `blend/sat.mp3` | "Sat!" | Enthusiastic, celebrating |
+| 2 | `blend/man.mp3` | "Man!" | Enthusiastic, celebrating |
+| 3 | `blend/fan.mp3` | "Fan!" | Enthusiastic, celebrating |
+| 4 | `blend/sun.mp3` | "Sun!" | Enthusiastic, celebrating |
+| 5 | `blend/fin.mp3` | "Fin!" | Enthusiastic, celebrating |
+| 6 | `blend/van.mp3` | "Van!" | Enthusiastic, celebrating |
+| 7 | `blend/run.mp3` | "Run!" | Enthusiastic, celebrating |
+| 8 | `blend/fun.mp3` | "Fun!" | Enthusiastic, celebrating |
+| 9 | `blend/win.mp3` | "Win!" | Enthusiastic, celebrating |
+| 10 | `blend/ran.mp3` | "Ran!" | Enthusiastic, celebrating |
+| 11 | `blend/cat.mp3` | "Cat!" | Enthusiastic, celebrating |
+| 12 | `blend/bat.mp3` | "Bat!" | Enthusiastic, celebrating |
+| 13 | `blend/hat.mp3` | "Hat!" | Enthusiastic, celebrating |
+| 14 | `blend/dog.mp3` | "Dog!" | Enthusiastic, celebrating |
+| 15 | `blend/big.mp3` | "Big!" | Enthusiastic, celebrating |
+| 16 | `blend/bed.mp3` | "Bed!" | Enthusiastic, celebrating |
+| 17 | `blend/bug.mp3` | "Bug!" | Enthusiastic, celebrating |
+| 18 | `blend/cup.mp3` | "Cup!" | Enthusiastic, celebrating |
+| 19 | `blend/pot.mp3` | "Pot!" | Enthusiastic, celebrating |
+| 20 | `blend/pig.mp3` | "Pig!" | Enthusiastic, celebrating |
+| 21 | `blend/red.mp3` | "Red!" | Enthusiastic, celebrating |
+| 22 | `blend/log.mp3` | "Log!" | Enthusiastic, celebrating |
+| 23 | `blend/zip.mp3` | "Zip!" | Enthusiastic, celebrating |
+| 24 | `blend/fox.mp3` | "Fox!" | Enthusiastic, celebrating |
+| 25 | `blend/wet.mp3` | "Wet!" | Enthusiastic, celebrating |
+| 26 | `blend/hop.mp3` | "Hop!" | Enthusiastic, celebrating |
+| 27 | `blend/jet.mp3` | "Jet!" | Enthusiastic, celebrating |
+| 28 | `blend/tag.mp3` | "Tag!" | Enthusiastic, celebrating |
+| 29 | `blend/kid.mp3` | "Kid!" | Enthusiastic, celebrating |
+| 30 | `blend/mud.mp3` | "Mud!" | Enthusiastic, celebrating |
+
+### E.4 Generic Prompt Recordings (5 files)
+
+**Folder:** `audio/word-builder/`
+**Format:** `prompt-[1-5].mp3`
+**What to say:** A warm, encouraging prompt played before the segmented phonemes. Varied to avoid repetition across rounds.
+
+| # | File | Script | Delivery Notes |
+|---|------|--------|----------------|
+| 1 | `word-builder/prompt-1.mp3` | "Can you build this word? Listen carefully..." | Warm, inviting, slight pause at the end before segmented audio plays |
+| 2 | `word-builder/prompt-2.mp3` | "Listen to the sounds and build the word!" | Encouraging, upbeat |
+| 3 | `word-builder/prompt-3.mp3` | "Let's build a word! Here are the sounds..." | Collaborative tone ("let's"), slight pause at the end |
+| 4 | `word-builder/prompt-4.mp3` | "Time to build! Listen..." | Shorter, energetic, good for when the child is in the flow |
+| 5 | `word-builder/prompt-5.mp3` | "Here comes a word! Listen to each sound..." | Playful anticipation |
+
+### E.5 Audio File Summary
+
+| Category | Folder | Count | Description |
+|----------|--------|-------|-------------|
+| Segmented words | `audio/segment/` | 30 | Phonemes spoken with pauses between each |
+| Blended words | `audio/blend/` | 30 | Word spoken enthusiastically as celebration |
+| Generic prompts | `audio/word-builder/` | 5 | Varied intro prompts before each word |
+| **Total** | | **65** | **1 recording session** |
+
+### E.6 Recording Session Plan
+
+**Recommended recording order** (to maintain consistent energy and tone):
+
+1. **Warm up** with the 5 generic prompts (short, varied, easy to get right)
+2. **Group 1 segmented words** (10 continuous-consonant words — these are the easiest to segment cleanly)
+3. **Group 1 blended words** (10 — quick, single words with enthusiasm)
+4. **Group 2 segmented words** (10 stop-consonant words — requires more care to avoid adding schwa)
+5. **Group 2 blended words** (10)
+6. **Group 3 segmented words** (10 mixed words)
+7. **Group 3 blended words** (10)
+
+**Common mistakes to avoid:**
+- Adding "uh" after stop consonants: say /b/ not /buh/, /t/ not /tuh/, /p/ not /puh/
+- Rushing the pauses between phonemes — leave a clear gap
+- Inconsistent volume between phonemes in the same word
+- Saying the letter name instead of the sound: /s/ not "ess", /m/ not "em"
+- For "fox": the final sound is /ks/ (two sounds blended), not /k/ then /s/ separately
