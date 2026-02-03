@@ -68,6 +68,9 @@ class WordHuntGame {
         this.backBtn = document.getElementById('back-btn');
         this.difficultyBtns = document.querySelectorAll('.difficulty-btn');
 
+        // Progression map nodes (replaces difficulty buttons)
+        this.mapNodes = document.querySelectorAll('.map-node');
+
         // Game elements
         this.buildingZone = document.getElementById('building-zone');
         this.wordArea = document.getElementById('word-area');
@@ -125,7 +128,7 @@ class WordHuntGame {
         // Set initial state
         this.updateMusicButton();
 
-        // Difficulty buttons
+        // Difficulty buttons (legacy, hidden)
         this.difficultyBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 audioManager.playClick();
@@ -133,6 +136,13 @@ class WordHuntGame {
                 btn.classList.add('active');
                 this.difficulty = btn.dataset.difficulty;
                 ProgressTracker.updateSetting('lastDifficulty', this.difficulty);
+            });
+        });
+
+        // Progression map nodes
+        this.mapNodes.forEach(node => {
+            node.addEventListener('click', () => {
+                this.selectMapNode(node);
             });
         });
 
@@ -168,8 +178,57 @@ class WordHuntGame {
 
         // Restore last difficulty
         this.difficulty = settings.lastDifficulty || 'alphabet';
+
+        // Update legacy difficulty buttons (hidden)
         this.difficultyBtns.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.difficulty === this.difficulty);
+        });
+
+        // Update progression map nodes
+        this.mapNodes.forEach(node => {
+            node.classList.toggle('active', node.dataset.difficulty === this.difficulty);
+        });
+
+        // Update star ratings on the map
+        this.updateMapStars();
+    }
+
+    selectMapNode(node) {
+        audioManager.playClick();
+
+        // Update active state
+        this.mapNodes.forEach(n => n.classList.remove('active'));
+        node.classList.add('active');
+
+        // Set difficulty
+        this.difficulty = node.dataset.difficulty;
+        ProgressTracker.updateSetting('lastDifficulty', this.difficulty);
+
+        // Play mode name audio if available
+        audioManager.playModeName(this.difficulty);
+    }
+
+    updateMapStars() {
+        // Update star display based on mastery for each mode
+        this.mapNodes.forEach(node => {
+            const difficulty = node.dataset.difficulty;
+            const starsContainer = node.querySelector('.node-stars');
+            if (!starsContainer) return;
+
+            // Calculate mastery for this mode
+            const mastery = ProgressTracker.getModeMastery(difficulty);
+            const starCount = mastery >= 90 ? 3 : mastery >= 60 ? 2 : mastery >= 30 ? 1 : 0;
+
+            // Update star display
+            const stars = [];
+            for (let i = 0; i < 3; i++) {
+                if (i < starCount) {
+                    stars.push('<span class="star-filled">★</span>');
+                } else {
+                    stars.push('<span class="star-empty">☆</span>');
+                }
+            }
+            starsContainer.innerHTML = stars.join('');
         });
     }
 
@@ -221,6 +280,8 @@ class WordHuntGame {
         switch (screenName) {
             case GameState.START:
                 this.startScreen.classList.add('active');
+                // Update star ratings when returning to start screen
+                this.updateMapStars();
                 break;
             case GameState.LOADING:
                 this.loadingScreen.classList.add('active');

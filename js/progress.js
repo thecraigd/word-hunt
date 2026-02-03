@@ -491,6 +491,21 @@ const ProgressTracker = {
     },
 
     /**
+     * Get average mastery score for a mode/difficulty (0-100).
+     * Used for star ratings on the progression map.
+     */
+    getModeMastery(difficulty) {
+        const wordSet = WORD_SETS[difficulty];
+        if (!wordSet || wordSet.length === 0) return 0;
+
+        let totalMastery = 0;
+        for (const word of wordSet) {
+            totalMastery += this.calculateMastery(word);
+        }
+        return Math.round(totalMastery / wordSet.length);
+    },
+
+    /**
      * Get recent session history (last N sessions).
      */
     getRecentSessions(limit = 10) {

@@ -29,12 +29,53 @@
                 <span style="--delay: 1">B</span>
                 <span style="--delay: 2">C</span>
             </div>
-            <div class="difficulty-selector">
-                <button class="difficulty-btn active" data-difficulty="alphabet">ABC</button>
-                <button class="difficulty-btn" data-difficulty="sound-match">Sounds</button>
-                <button class="difficulty-btn" data-difficulty="word-builder">Build</button>
-                <button class="difficulty-btn" data-difficulty="easy">Easy</button>
-                <button class="difficulty-btn" data-difficulty="harder">Harder</button>
+            <div class="progression-map">
+                <div class="map-path">
+                    <!-- Row 1: Foundation skills -->
+                    <div class="map-row">
+                        <div class="map-node active" data-difficulty="alphabet" data-color="blue">
+                            <div class="node-icon">ABC</div>
+                            <div class="node-name">Letter Hunt</div>
+                            <div class="node-stars"><span class="star-empty">☆</span><span class="star-empty">☆</span><span class="star-empty">☆</span></div>
+                        </div>
+                        <div class="map-connector"></div>
+                        <div class="map-node" data-difficulty="sound-match" data-color="orange">
+                            <div class="node-icon">🔊</div>
+                            <div class="node-name">Sound Safari</div>
+                            <div class="node-stars"><span class="star-empty">☆</span><span class="star-empty">☆</span><span class="star-empty">☆</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Vertical connector -->
+                    <div class="map-connector-vertical"></div>
+
+                    <!-- Row 2: Word skills -->
+                    <div class="map-row">
+                        <div class="map-node" data-difficulty="easy" data-color="purple">
+                            <div class="node-icon">🌟</div>
+                            <div class="node-name">First Words</div>
+                            <div class="node-stars"><span class="star-empty">☆</span><span class="star-empty">☆</span><span class="star-empty">☆</span></div>
+                        </div>
+                        <div class="map-connector"></div>
+                        <div class="map-node" data-difficulty="harder" data-color="coral">
+                            <div class="node-icon">🚀</div>
+                            <div class="node-name">Big Words</div>
+                            <div class="node-stars"><span class="star-empty">☆</span><span class="star-empty">☆</span><span class="star-empty">☆</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Vertical connector -->
+                    <div class="map-connector-vertical"></div>
+
+                    <!-- Row 3: Advanced skills -->
+                    <div class="map-row map-row-center">
+                        <div class="map-node" data-difficulty="word-builder" data-color="green">
+                            <div class="node-icon">🔨</div>
+                            <div class="node-name">Word Builder</div>
+                            <div class="node-stars"><span class="star-empty">☆</span><span class="star-empty">☆</span><span class="star-empty">☆</span></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <button id="play-btn" class="play-btn">Play</button>
             <button id="dashboard-btn" class="dashboard-btn" title="Parent Dashboard">

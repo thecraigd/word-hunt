@@ -279,6 +279,28 @@ class AudioManager {
     }
 
     /**
+     * Play mode name audio for the progression map.
+     * Audio files should be in audio/modes/{difficulty}.mp3
+     * e.g., audio/modes/alphabet.mp3 for "Letter Hunt"
+     *
+     * Mode names:
+     *   alphabet    -> "Letter Hunt"
+     *   sound-match -> "Sound Safari"
+     *   word-builder -> "Word Builder"
+     *   easy        -> "First Words"
+     *   harder      -> "Big Words"
+     */
+    async playModeName(difficulty) {
+        if (!this.audioEnabled) return;
+        // Try to play the mode name audio; silently fail if not available yet
+        try {
+            await this.playAudio(`modes/${difficulty}`);
+        } catch (e) {
+            // Audio file not recorded yet — that's OK
+        }
+    }
+
+    /**
      * Play an audio file (starts playback, doesn't wait for completion)
      */
     async playAudio(path) {
