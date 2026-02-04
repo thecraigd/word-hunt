@@ -82,10 +82,11 @@ class WordHuntGame {
         this.confettiContainer = document.getElementById('confetti-container');
         this.completeMessage = document.getElementById('complete-message');
 
-        // Music toggle
+        // Music toggle and next track
         this.musicToggleBtn = document.getElementById('music-toggle-btn');
         this.musicIconOn = document.getElementById('music-icon-on');
         this.musicIconOff = document.getElementById('music-icon-off');
+        this.nextTrackBtn = document.getElementById('next-track-btn');
 
         // Scoring elements
         this.timerEl = document.getElementById('timer');
@@ -125,6 +126,11 @@ class WordHuntGame {
 
         // Music toggle
         this.musicToggleBtn.addEventListener('click', () => this.toggleMusic());
+        // Next track button
+        this.nextTrackBtn.addEventListener('click', () => {
+            audioManager.playClick();
+            audioManager.nextTrack();
+        });
         // Set initial state
         this.updateMusicButton();
 

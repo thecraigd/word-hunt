@@ -1388,6 +1388,7 @@ body {
 
 .letter-slot.filled.coral { background-color: var(--coral); border-color: var(--coral); }
 .letter-slot.filled.orange { background-color: var(--orange); border-color: var(--orange); }
+.letter-slot.filled.yellow { background-color: var(--yellow); border-color: var(--yellow); }
 .letter-slot.filled.green { background-color: var(--green); border-color: var(--green); }
 .letter-slot.filled.blue { background-color: var(--blue); border-color: var(--blue); }
 .letter-slot.filled.purple { background-color: var(--purple); border-color: var(--purple); }

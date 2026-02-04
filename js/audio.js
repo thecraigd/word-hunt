@@ -28,7 +28,7 @@ const BACKGROUND_TRACKS = [
     'background/Ever-Youre-Doing-Great',
     'background/Open-up-the-page',
     'background/Retrowave'
-];
+].sort();
 
 class AudioManager {
     constructor() {
@@ -37,6 +37,7 @@ class AudioManager {
         this.audioEnabled = true;
         this.musicEnabled = true;
         this.bgMusic = null;
+        this.currentTrackIndex = 0;
     }
 
     /**
@@ -366,18 +367,32 @@ class AudioManager {
     }
 
     /**
-     * Start background music (random track, looping)
+     * Start background music (plays tracks in alphabetical order)
      */
     startBackgroundMusic() {
         this.stopBackgroundMusic();
         if (!this.musicEnabled) return;
 
-        const track = BACKGROUND_TRACKS[Math.floor(Math.random() * BACKGROUND_TRACKS.length)];
+        this.playTrackAtIndex(this.currentTrackIndex);
+    }
+
+    /**
+     * Play a specific track by index
+     */
+    playTrackAtIndex(index) {
+        const track = BACKGROUND_TRACKS[index];
         const parts = track.split('/');
         const encoded = parts.map(p => encodeURIComponent(p)).join('/');
         const audio = new Audio(`${AUDIO_BASE_URL}/${encoded}.mp3`);
-        audio.loop = true;
         audio.volume = 0.25;
+
+        // When track ends, play the next one
+        audio.addEventListener('ended', () => {
+            this.currentTrackIndex = (this.currentTrackIndex + 1) % BACKGROUND_TRACKS.length;
+            if (this.musicEnabled) {
+                this.playTrackAtIndex(this.currentTrackIndex);
+            }
+        });
 
         audio.play().catch(e => console.log('Background music play failed:', e));
         this.bgMusic = audio;
@@ -392,6 +407,16 @@ class AudioManager {
             this.bgMusic.currentTime = 0;
             this.bgMusic = null;
         }
+    }
+
+    /**
+     * Skip to the next track
+     */
+    nextTrack() {
+        if (!this.musicEnabled) return;
+        this.currentTrackIndex = (this.currentTrackIndex + 1) % BACKGROUND_TRACKS.length;
+        this.stopBackgroundMusic();
+        this.playTrackAtIndex(this.currentTrackIndex);
     }
 
     /**
