@@ -59,7 +59,7 @@ word-hunt/audio/
 1. Create a new repo `word-hunt`
 2. Push this folder's contents
 3. Enable GitHub Pages in Settings
-4. Access at `https://yourusername.github.io/word-hunt/`
+4. Access at [https://thecraigd.github.io/word-hunt/](https://thecraigd.github.io/word-hunt/)
 
 ### Any Static Host
 
